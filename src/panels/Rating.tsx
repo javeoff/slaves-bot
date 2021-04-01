@@ -1,21 +1,16 @@
 import React, { FC } from "react";
-
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
 import { UserInfo } from "@vkontakte/vk-bridge";
-
-import { Header } from "../components/Header/Header";
-import { SlavesList } from "../components/SlavesList/SlavesList";
-
 interface IProps {
   id?: string;
   fetchedUser: UserInfo | null;
 }
 
-const Home: FC<IProps> = ({ id, fetchedUser }) => (
+const Rating: FC<IProps> = ({ id, fetchedUser }) => (
   <Panel id={id}>
-    <PanelHeader>Рабы</PanelHeader>
+    <PanelHeader>Рейтинг</PanelHeader>
   </Panel>
 );
 
-export default Home;
+export default Rating;

@@ -1,4 +1,4 @@
-import { Banner, Group, Header, HorizontalScroll, Link } from '@vkontakte/vkui';
+import { Banner, Div, Group, Header, HorizontalScroll } from '@vkontakte/vkui';
 import {
   Icon24CupOutline,
   Icon28MoneyCircleOutline,
@@ -11,8 +11,8 @@ const menuData = [
   {
     icon: (
       <Icon28ShoppingCartOutline
-        width={40}
-        height={40}
+        width={32}
+        height={32}
         style={{ margin: 'auto' }}
       />
     ),
@@ -24,8 +24,8 @@ const menuData = [
   {
     icon: (
       <Icon28MoneyCircleOutline
-        width={40}
-        height={40}
+        width={32}
+        height={32}
         style={{ margin: 'auto' }}
       />
     ),
@@ -35,7 +35,7 @@ const menuData = [
   },
   {
     icon: (
-      <Icon24CupOutline width={40} height={40} style={{ margin: 'auto' }} />
+      <Icon24CupOutline width={32} height={32} style={{ margin: 'auto' }} />
     ),
     header: 'Топ игроков',
     subheader: 'По рабам',
@@ -45,19 +45,15 @@ const menuData = [
 
 export const Menu: FC = () => (
   <Group
-    header={
-      <Header aside={<Link href='/'>Всего рабов: 523</Link>}>
-        Вы в рабстве
-      </Header>
-    }
+    header={<Header aside={<span>Всего рабов: 523</span>}>Вы в рабстве</Header>}
     style={{ width: '100%' }}
   >
     <HorizontalScroll>
-      <div
+      <Div
         style={{
           display: 'flex',
-          justifyContent: 'space-around',
-          width: '100%',
+          paddingTop: 0,
+          paddingBottom: 0,
         }}
       >
         {menuData.map((card) => (
@@ -66,7 +62,7 @@ export const Menu: FC = () => (
             header={card.header}
             subheader={card.subheader}
             before={card.icon}
-            style={{ minWidth: 192, padding: '0 5px', height: 60 }}
+            style={{ minWidth: 172, padding: '5px 5px', flex: 1, height: 60 }}
             background={
               <div
                 style={{
@@ -81,14 +77,13 @@ export const Menu: FC = () => (
             }
           />
         ))}
-      </div>
+      </Div>
     </HorizontalScroll>
   </Group>
 );
 
 const SBanner = styled(Banner)`
   & > * {
-    height: 40px;
   }
 
   ${(p) =>

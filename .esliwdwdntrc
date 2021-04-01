@@ -25,7 +25,6 @@
     }
   },
   "plugins": [
-    "prettier",
     "prefer-arrow"
   ],
   "extends": [
@@ -40,8 +39,7 @@
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
-    "plugin:sonarjs/recommended",
-    "prettier"
+    "plugin:sonarjs/recommended"
   ],
   "rules": {
     "sonarjs/no-duplicate-string": "off",
@@ -105,15 +103,7 @@
       "always"
     ],
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": [
-      "error",
-      {
-        "usePrettierrc": true,
-        "endOfLines": "auto"
-      }
-    ],
     "prefer-arrow/prefer-arrow-functions": "error",
-    "implicit-arrow-linebreak": "off",
     "unicorn/no-array-for-each": "off",
     "unicorn/filename-case": [
       "error",

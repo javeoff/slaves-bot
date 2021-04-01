@@ -11,17 +11,12 @@ export const SlavesList: FC = () => (
       style={{ marginTop: 20 }}
       disabled={true}
       multiline={true}
-      before={<Avatar size={72} />}
-      caption={
-        <div>
-          Работает: <b>В монастыре</b>
-        </div>
-      }
+      before={<Avatar size={48} />}
+      caption={<div>На работе В монастыре</div>}
       after='+ 1 500 ₽ / час'
       actions={
         <>
-          <Button>Информация</Button>
-          <Button mode='secondary'>Сковать в наручники [200 ₽]</Button>
+          <Button mode='secondary'>Купить наручники за 200 ₽</Button>
         </>
       }
     >
