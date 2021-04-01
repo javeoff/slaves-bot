@@ -13,6 +13,7 @@ import {
   PAGE_MARKET,
   PAGE_RATING,
   PANEL_MAIN,
+  PANEL_MAIN_USER,
   PANEL_MARKET,
   PANEL_RATING,
   router,
@@ -29,6 +30,8 @@ import {
 
 import Home from "./panels/Home";
 import Market from "./panels/Market";
+import Rating from "./panels/Rating";
+import User from "./panels/User";
 
 const App = () => {
   const location = useLocation();
@@ -83,6 +86,7 @@ const App = () => {
           activePanel={String(location.getViewActivePanel(VIEW_MAIN))}
         >
           <Home id={PANEL_MAIN} fetchedUser={fetchedUser} />
+          <User id={PANEL_MAIN_USER} />
         </View>
         <View
           id={VIEW_MARKET}
@@ -94,7 +98,7 @@ const App = () => {
           id={VIEW_RATING}
           activePanel={String(location.getViewActivePanel(VIEW_RATING))}
         >
-          <Market id={PANEL_RATING} />
+          <Rating id={PANEL_RATING} />
         </View>
       </Epic>
     </AdaptivityProvider>
