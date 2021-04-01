@@ -4,11 +4,13 @@ interface IState {
   count: number;
 }
 
+const initialState = {
+  count: 0,
+};
+
 export const counterSlice = createSlice({
   name: 'counter',
-  initialState: {
-    count: 0,
-  } as IState,
+  initialState: initialState,
   reducers: {
     increment: (draft) => {
       draft.count += 1;

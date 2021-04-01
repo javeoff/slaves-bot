@@ -4,11 +4,14 @@ import {
   getDefaultMiddleware,
   StateFromReducersMapObject,
 } from '@reduxjs/toolkit';
+
 import { Feature } from '../enums/Feature';
 import { counterSlice } from '../../features/Counter/duck/slice';
+import { appSlice } from '../../features/App/duck/slice';
 
 const reducer = {
   [Feature.COUNTER]: counterSlice.reducer,
+  [Feature.APP]: appSlice.reducer,
 };
 
 export type IRootState = StateFromReducersMapObject<typeof reducer>;

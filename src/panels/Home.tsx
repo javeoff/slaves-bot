@@ -8,15 +8,6 @@ interface IProps {
   fetchedUser: UserInfo | null;
 }
 
-// type Slave = {
-//   id: Number;
-//   last_time
-// };
-
-// let slaves:Slave[] = [];
-
-// const slaves Slave[] = [];
-
 const Home: FC<IProps> = ({ id, fetchedUser }) => (
   <Panel id={id}>
     <PanelHeader>Рабы</PanelHeader>
