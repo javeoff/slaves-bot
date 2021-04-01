@@ -41,6 +41,7 @@
     "tsconfig-paths-webpack-plugin": "^3.3.0"
   },
   "dependencies": {
+    "@happysanta/router": "^0.1.14",
     "@reduxjs/toolkit": "^1.5.1",
     "@vkontakte/icons": "^1.89.0",
     "@vkontakte/vk-bridge": "^2.4.1",
