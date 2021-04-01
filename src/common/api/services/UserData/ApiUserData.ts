@@ -1,7 +1,6 @@
-import { ApiServiceBase } from '../../apiServiceBase';
 import { ApiResponse } from '../../ApiResponse';
+import { ApiServiceBase } from '../../ApiServiceBase';
 import { IUserDataResponseDto } from '../../dto/features/UserData/response/IUserDataResponseDto';
-
 class ApiUserData extends ApiServiceBase {
   public constructor() {
     super();

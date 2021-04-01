@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { apiUserData } from '../../../common/api/services/UserData/ApiUserData';
 
 interface IState {
   count: number;
@@ -8,9 +9,10 @@ interface IState {
 
 export const asyncActions = {
   getUserInfo: createAsyncThunk(`/user`, async (dto) => {
-    const response = await apiUserData.getData(dto);
+    // const response = await apiUserData.getData(dto);
 
-    return response.payload;
+    // return response.payload;
+    return null
   }),
 };
 

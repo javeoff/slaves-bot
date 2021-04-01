@@ -108,7 +108,8 @@
     "prettier/prettier": [
       "error",
       {
-        "usePrettierrc": true
+        "usePrettierrc": true,
+        "endOfLines": "auto"
       }
     ],
     "prefer-arrow/prefer-arrow-functions": "error",
