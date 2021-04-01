@@ -1,0 +1,175 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/ignore": [
+      "node_modules"
+    ],
+    "import/resolver": {
+      "typescript": {}
+    },
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".ts",
+        ".tsx"
+      ]
+    }
+  },
+  "plugins": [
+    "prettier",
+    "prefer-arrow"
+  ],
+  "extends": [
+    "airbnb-typescript",
+    "airbnb/hooks",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:eslint-comments/recommended",
+    "plugin:promise/recommended",
+    "plugin:unicorn/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:sonarjs/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "sonarjs/no-duplicate-string": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": ["typeAlias"],
+        "format": [
+          "PascalCase"
+        ],
+        "custom": {
+          "regex": "^[TI][A-Z]",
+          "match": true
+        }
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-floating-promises": [
+      "error",
+      {
+        "ignoreVoid": true,
+        "ignoreIIFE": true
+      }
+    ],
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        "default": "array-simple",
+        "readonly": "array-simple"
+      }
+    ],
+    "@typescript-eslint/explicit-member-accessibility": ["error"],
+    "@typescript-eslint/method-signature-style": ["error", "method"],
+    "import/prefer-default-export": "off",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          [
+            "external",
+            "builtin"
+          ],
+          [
+            "index",
+            "sibling",
+            "internal",
+            "parent"
+          ]
+        ],
+        "newlines-between": "always-and-inside-groups"
+      }
+    ],
+    "react/prop-types": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-boolean-value": [
+      "error",
+      "always"
+    ],
+    "react/react-in-jsx-scope": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        "usePrettierrc": true
+      }
+    ],
+    "prefer-arrow/prefer-arrow-functions": "error",
+    "implicit-arrow-linebreak": "off",
+    "unicorn/no-array-for-each": "off",
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          "camelCase": true,
+          "pascalCase": true
+        }
+      }
+    ],
+    "unicorn/explicit-length-check": "off",
+    "unicorn/no-fn-reference-in-iterator": "off",
+    "unicorn/numeric-separators-style": [
+      "error",
+      {
+        "number": {
+          "minimumDigits": 0,
+          "groupLength": 3
+        }
+      }
+    ],
+    "unicorn/no-null": "off",
+    "unicorn/prevent-abbreviations": "off",
+    "promise/prefer-await-to-then": "error",
+    "no-console": "error",
+    "newline-after-var": "off",
+    "newline-before-return": "error",
+    "arrow-body-style": [
+      "error",
+      "as-needed"
+    ],
+    "class-methods-use-this": "off",
+    "no-param-reassign": [
+      "error",
+      {
+        "props": true,
+        "ignorePropertyModificationsFor": [
+          "draft",
+          "context"
+        ]
+      }
+    ],
+    "no-void": ["error", { "allowAsStatement": true }],
+    "jsx-a11y/label-has-associated-control": "off",
+    "quotes": ["error", "single"],
+    "@typescript-eslint/no-use-before-define": "off"
+  },
+  "overrides": [{
+    "env": {
+      "jest": true
+    },
+    "files": ["*.test.tsx", "src/__e2e__/**/*.*"],
+    "rules": {
+      "@typescript-eslint/no-unsafe-call": ["off"],
+      "@typescript-eslint/no-unsafe-member-access": ["off"],
+      "import/no-extraneous-dependencies": ["off"],
+      "import/no-cycle": ["off"]
+    }
+  }]
+}
