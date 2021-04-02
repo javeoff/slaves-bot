@@ -19,19 +19,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "paths": {
-      "@assets/*": [
-        "src/assets/*"
-      ],
-      "@features/*": [
-        "src/features/*"
-      ],
-      "@common/*": [
-        "src/common/*"
-      ]
-    }
   },
-  "include": [
-    ""
-  ]
+  "include": [],
 }

@@ -48,9 +48,13 @@ import { ISlaveData } from "../common/types/ISlaveData";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { bridgeClient } from "../common/bridge/bridge";
-import { IUserDataResponseDto } from "../common/simple_api/types";
+import {
+  IUserActionResponseDto,
+  IUserDataResponseDto,
+} from "../common/simple_api/types";
 import { MODAL_ERROR_CARD } from "../modals/Error";
 import { getSubDate } from "../common/helpers";
+import { openErrorModal } from "../modals/openers";
 
 interface IProps extends IWithUserInfo {
   id?: string;
@@ -60,12 +64,11 @@ interface IProps extends IWithUserInfo {
 const User: FC<IProps> = ({
   id: panelId,
   usersInfo,
-  slaves,
-  updateSlave,
-  updateSlaves,
-  updateUsersInfo,
   currentUserInfo,
   key,
+  updateSlaves,
+  updateUsersInfo,
+  updateUserInfo,
 }) => {
   let router = useRouter();
   let location = useLocation();
@@ -74,165 +77,124 @@ const User: FC<IProps> = ({
   let userId = Number(id);
 
   let [loading, setLoading] = useState<boolean>(true);
-
   let [userInfo, setUserInfo] = useState<UserInfo>(DefaultUserInfo);
   let [masterInfo, setMasterInfo] = useState<UserInfo>(DefaultUserInfo);
   let [slave, setSlave] = useState<ISlaveData>(DefaultSlave);
   let [userSlaves, setSlaves] = useState<ISlaveWithUserInfo[]>([]);
-  let [loadedMaster, setLoadedMaster] = useState<boolean>(false);
-  let [loadedUserPage, setUserPage] = useState<
-    IUserDataResponseDto | undefined
-  >();
 
-  let gotUser = false;
+  let [loadedUserInfo, setLoadedUserInfo] = useState<boolean>(false);
+  let [loadedMasterInfo, setLoadedMasterInfo] = useState<boolean>(false);
+  let [loadedUserData, setLoadedUserData] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (!loadedMaster && loadedUserPage) {
-        // Загружаем инфу о владельце
-        if (slave.master_id != 0) {
-          if (usersInfo[slave.master_id]) {
-            // Берем из кеша
-            setMasterInfo(usersInfo[slave.master_id]);
-          } else {
-            let updatedMasterInfo = await bridgeClient.getUsersByIds([
-              slave.master_id,
-              -1,
-            ]);
-            setMasterInfo(updatedMasterInfo[0]);
-          }
-          setLoadedMaster(true);
-        }
+      let loadedUserInfo = usersInfo[userId];
+      if (!loadedUserInfo) {
+        let newUserInfo = await bridgeClient.getUsersByIds([userId, -1]);
+        loadedUserInfo = newUserInfo[0];
+        updateUserInfo(loadedUserInfo);
       }
-
-      if (!loadedUserPage) {
-        let userPage: IUserDataResponseDto = {
-          user: DefaultSlave,
-          slaves: [],
-        };
-
-        if (slaves[userId]) {
-          userPage.user = slaves[userId];
-          for (let slaveId in slaves) {
-            if (slaves[slaveId].master_id === userId && slaves[slaveId]) {
-              userPage.slaves.push(slaves[slaveId]);
-            }
-          }
-        } else {
-          userPage = await simpleApi.getUser(userId);
-          updateSlaves(userPage.slaves);
-          updateSlave(userPage.user);
-        }
-
-        setUserPage(userPage);
-
-        if (!gotUser) {
-          let slavesUsersInfo: UserInfo[] = [];
-          let slaveIds: Record<number, ISlaveData> = {};
-
-          userPage.slaves.forEach((slave) => {
-            if (usersInfo[slave.id]) {
-              slavesUsersInfo.push(usersInfo[slave.id]);
-              slaveIds[slave.id] = slaves[slave.id];
-            } else {
-              slaveIds[slave.id] = slave;
-            }
-          });
-
-          if (Object.keys(slaveIds).length) {
-            let dataSlavesUsersInfo = await bridgeClient.getUsersByIds(
-              Object.keys(slaveIds).map((a) => Number(a))
-            );
-            slavesUsersInfo = dataSlavesUsersInfo.concat(slavesUsersInfo);
-          }
-
-          let updatedUserInfo: UserInfo;
-
-          if (usersInfo[userId]) {
-            updatedUserInfo = usersInfo[userId];
-          } else {
-            let updatedDataUserInfo = await bridgeClient.getUsersByIds([
-              userId,
-              -1,
-            ]);
-            updatedUserInfo = updatedDataUserInfo[0];
-            updateUsersInfo([updatedUserInfo]);
-          }
-
-          let slavesList: ISlaveWithUserInfo[] = [];
-          slavesUsersInfo.forEach((user) => {
-            slavesList.push({
-              user_info: user,
-              slave_object: slaveIds[user.id],
-            });
-          });
-
-          setSlaves(slavesList);
-          setSlave(userPage.user);
-          setUserInfo(updatedUserInfo);
-          updateUsersInfo(slavesUsersInfo);
-
-          gotUser = true;
-        }
-      }
-
-      if (usersInfo[userId]) {
-        setUserInfo(usersInfo[userId]);
-      }
-
-      if (slaves[userId]) {
-        setSlave(slaves[userId]);
-      }
-      if (slave.id && userInfo.id && loadedUserPage) {
-        setLoading(false);
-      }
+      setUserInfo(loadedUserInfo);
+      setLoadedUserInfo(true);
     };
     void fetchUserInfo();
-  });
+  }, []); // Первый запуск
 
+  useEffect(() => {
+    const fetchSlaveData = async () => {
+      let newSlaveData = await simpleApi.getUser(userId);
+      updateSlaves([newSlaveData.user, ...newSlaveData.slaves]);
+      let slavesObjects: Record<number, ISlaveData> = {};
+      let cachedSlavesInfo: Record<number, boolean> = {};
+      let slaveIds = newSlaveData.slaves.map((slave) => {
+        slavesObjects[slave.id] = slave;
+        if (usersInfo[slave.id]) {
+          cachedSlavesInfo[slave.id] = true;
+          return 0;
+        }
+        return slave.id;
+      });
+      slaveIds = slaveIds.filter((slaveId) => slaveId);
+      let slavesInfoWithObject: ISlaveWithUserInfo[] = [];
+
+      if (slaveIds.length) {
+        let slavesInfo = await bridgeClient.getUsersByIds(slaveIds);
+        updateUsersInfo(slavesInfo);
+        slavesInfoWithObject = slavesInfoWithObject.concat(
+          slavesInfo.map((user) => {
+            return {
+              user_info: user,
+              slave_object: slavesObjects[user.id],
+            };
+          })
+        );
+      }
+
+      for (let slaveId in cachedSlavesInfo) {
+        slavesInfoWithObject.push({
+          user_info: usersInfo[slaveId],
+          slave_object: slavesObjects[slaveId],
+        });
+      }
+
+      setSlaves(slavesInfoWithObject);
+      setSlave(newSlaveData.user);
+      setLoadedUserData(true);
+    };
+    if (userInfo.id) {
+      void fetchSlaveData();
+    }
+  }, [userInfo]); // Когда получили инфу о пользователе, получаем инфу о рабах
+
+  useEffect(() => {
+    // Подгружаем инфу о владельце этого раба
+    const loadMasterInfo = async () => {
+      if (slave.master_id) {
+        let slaveMasterInfo = usersInfo[slave.master_id];
+        if (!slaveMasterInfo && slave.master_id) {
+          let newSlaveMasterInfo = await bridgeClient.getUsersByIds([
+            slave.master_id,
+            -1,
+          ]);
+          slaveMasterInfo = newSlaveMasterInfo[0];
+          updateUserInfo(slaveMasterInfo);
+        }
+        setMasterInfo(slaveMasterInfo);
+      } else {
+        setMasterInfo(DefaultUserInfo);
+      }
+      setLoadedMasterInfo(true);
+    };
+    if (slave.id) {
+      void loadMasterInfo();
+    }
+  }, [slave]); // Только, когда меняется инфа о рабе
+
+  useEffect(() => {
+    if (loadedUserInfo && loadedUserData && loadedMasterInfo) {
+      setLoading(false);
+    }
+  }, [loadedUserInfo, loadedUserData, loadedMasterInfo]);
+
+  const syncNewSlave = (res: IUserActionResponseDto) => (
+    updateSlaves([res.user, res.slave]), setSlave(res.slave)
+  );
+
+  // Покупка
   const buySlave = () => {
-    simpleApi
-      .buySlave(slave.id)
-      .then((res) => {
-        updateSlaves([res.user, res.slave]);
-        setLoadedMaster(false);
-        setSlave(res.slave);
-      })
-      .catch((e) => {
-        router.pushModal(MODAL_ERROR_CARD, {
-          message: e.message,
-        });
-      });
+    simpleApi.buySlave(slave.id).then(syncNewSlave).catch(openErrorModal);
   };
 
+  // Цепь
   const fetterSlave = () => {
-    simpleApi
-      .fetterSlave(slave.id)
-      .then((res) => {
-        updateSlaves([res.user, res.slave]);
-        setLoadedMaster(false);
-        setSlave(res.slave);
-      })
-      .catch((e) => {
-        router.pushModal(MODAL_ERROR_CARD, {
-          message: e.message,
-        });
-      });
+    simpleApi.fetterSlave(slave.id).then(syncNewSlave).catch(openErrorModal);
   };
 
+  // Продажа
   const sellSlave = () => {
-    simpleApi
-      .sellSlave(slave.id)
-      .then((res) => {
-        updateSlaves([res.user, res.slave]);
-        setLoadedMaster(false);
-        setSlave(res.slave);
-      })
-      .catch((e) => {
-        router.pushModal(MODAL_ERROR_CARD, {
-          message: e.message,
-        });
-      });
+    simpleApi.sellSlave(slave.id).then(syncNewSlave).catch(openErrorModal);
   };
+
   return (
     <Panel key={key} id={panelId}>
       <PanelHeader
