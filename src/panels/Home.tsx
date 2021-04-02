@@ -1,18 +1,46 @@
 import React, { FC } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
-import { UserInfo } from "@vkontakte/vk-bridge";
 import { Group } from "@vkontakte/vkui";
-interface IProps {
+
+import {
+  IWithCurrentUserInfo,
+  withCurrentUserInfo,
+} from "../features/App/hocs/withAppState";
+import { UserHeader } from "../components/UserHeader/UserHeader";
+import { SlavesList } from "../components/SlavesList/SlavesList";
+import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
+
+interface IProps extends IWithCurrentUserInfo {
   id?: string;
-  fetchedUser: UserInfo | null;
 }
 
-const Home: FC<IProps> = ({ id, fetchedUser }) => (
-  <Panel id={id}>
-    <PanelHeader>Рабы</PanelHeader>
-    <Group title="Рабы"></Group>
-  </Panel>
-);
+const Home: FC<IProps> = ({
+  id,
+  userInfo,
+  userSlave,
+  userSlaves,
+  userSlavesInfo,
+}) => {
+  let generatedSlavesList: ISlaveWithUserInfo[] = [];
+  for (let slaveId in userSlaves) {
+    generatedSlavesList.push({
+      user_info: userSlavesInfo[slaveId],
+      slave_object: userSlaves[slaveId],
+    });
+  }
+  console.log("Generated", generatedSlavesList, userSlaves);
+  return (
+    <Panel id={id}>
+      <PanelHeader>Рабы</PanelHeader>
+      <Group title="Рабы"></Group>
+      <UserHeader user={userInfo} slave={userSlave} isMe={true}></UserHeader>
+      <SlavesList
+        slavesCount={userSlave.slaves_count}
+        slaves={generatedSlavesList}
+      ></SlavesList>
+    </Panel>
+  );
+};
 
-export default Home;
+export default withCurrentUserInfo(Home);

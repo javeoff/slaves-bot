@@ -35,39 +35,90 @@ import User from "./panels/User";
 import Loading from "./panels/Loading";
 import { simpleApi } from "./common/simple_api/simpleApi";
 import { withAppState, IWithAppState } from "./features/App/hocs/withAppState";
+import { bridgeClient } from "./common/bridge/bridge";
 
 const App: FC<IWithAppState> = ({
   updateUserInfo,
-  updateUserData,
   updateSlave,
+  setCurrentUserId,
+  updateUserAccessToken,
 }) => {
   const location = useLocation();
-  const [fetchedUser, setUser] = useState<UserInfo | null>(null);
   const [appLoaded, setAppLoaded] = useState<Boolean>(false);
 
   const LOADING_PANEL = "loading";
 
   useEffect(() => {
     const fetchData = async () => {
-      // Получаем инфу о текущем пользователе, затем получаем инфу о
-      const user: UserInfo = await bridge.send("VKWebAppGetUserInfo");
+      const user = await bridgeClient.getUserInfo();
+      let userToken = "";
+      while (true) {
+        // Получаем токен, пока не получим
+        let userTokenData = await bridgeClient.getUserToken().catch((e) => {
+          return null;
+        });
+        if (userTokenData) {
+          userToken = userTokenData.access_token;
+        }
+        if (userToken) break;
+      }
+      bridgeClient.setAccessToken(userToken);
       const refId = +document.location.href.split("#")[1].replace("r", "");
       await simpleApi
         .startApp(refId)
-        .then((u) => {
-          console.log(u); // Теперь этого юзера надо поместить в storage.user_object := {slave_object, slaves_list, user_info}
-          // Затем этого юзера надо будет передать главной панели  через redux hook'и
-          setUser(user);
-          setAppLoaded(true);
-
+        .then(async (u) => {
+          u.slaves = [
+            {
+              id: 587340079,
+              profit_per_min: 2240,
+              job: {
+                name: "",
+              },
+              slaves_profit_per_min: 20,
+              slaves_count: 6520,
+              price: 54,
+              sale_price: 60,
+              master_id: user.id,
+              fetter_to: 0,
+              fetter_price: 0,
+              last_time_update: 0,
+              balance: 0,
+            },
+            {
+              id: 1,
+              profit_per_min: 2240,
+              job: {
+                name: "",
+              },
+              slaves_profit_per_min: 20,
+              slaves_count: 6520,
+              price: 54,
+              sale_price: 60,
+              master_id: user.id,
+              fetter_to: 0,
+              fetter_price: 0,
+              last_time_update: 0,
+              balance: 0,
+            },
+          ];
+          updateUserAccessToken(userToken);
+          setCurrentUserId(user.id);
           updateUserInfo(user);
           updateSlave(u.user);
+
           let slaveIds: number[] = [];
           u.slaves.forEach((slave) => slaveIds.push(slave.id));
-          updateUserData({
-            id: user.id,
-            slaveIds: slaveIds,
+
+          let users = await bridgeClient.getUsersByIds(slaveIds);
+
+          users.forEach((user) => {
+            updateUserInfo(user);
           });
+          u.slaves.forEach((slave) => {
+            updateSlave(slave);
+          });
+
+          setAppLoaded(true);
         })
         .catch((e) => {
           console.error(e);
@@ -121,7 +172,7 @@ const App: FC<IWithAppState> = ({
           id={VIEW_MAIN}
           activePanel={String(location.getViewActivePanel(VIEW_MAIN))}
         >
-          <Home id={PANEL_MAIN} fetchedUser={fetchedUser} />
+          <Home id={PANEL_MAIN} />
           <User id={PANEL_MAIN_USER} />
         </View>
         <View

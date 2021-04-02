@@ -3,19 +3,20 @@ import { UserInfo } from '@vkontakte/vk-bridge';
 import { ISlaveData } from '../../../common/types/ISlaveData';
 import { IUserData } from '../../../common/types/IUserData';
 
-const initialState = {
+const initialState:IAppState = {
   currentUserId: 0,
-  slaves: new Map<number, ISlaveData>(),
-  usersInfo: new Map<number, UserInfo>(),
-  usersData: new Map<number, IUserData>(),
+  slaves: {},
+  usersInfo: {},
+  usersData: {},
+  userAccessToken: "",
 };
 
 export interface IAppState {
   currentUserId: number,
-  
-  slaves: Map<number, ISlaveData>, // Объект с информацией о рабах с сервера
-  usersInfo: Map<number, UserInfo>, // Объект из {1: UserInfo, 2: UserInfo}
-  usersData: Map<number, IUserData>, // Объект с упрощенной информацией о каждом пользователе
+  userAccessToken: string,
+  slaves: Record<number, ISlaveData>, // Объект с информацией о рабах с сервера
+  usersInfo: Record<number, UserInfo>, // Объект из {1: UserInfo, 2: UserInfo}
+  usersData: Record<number, IUserData>, // Объект с упрощенной информацией о каждом пользователе
 }
 
 export const appSlice = createSlice({
@@ -23,16 +24,20 @@ export const appSlice = createSlice({
   initialState: initialState,
   reducers: {
     updateSlave: (draft, action:PayloadAction<ISlaveData>) => {
-      draft.slaves.set(action.payload.id, action.payload);
+      draft.slaves[action.payload.id] = action.payload;
     },
     updateUserInfo: (draft, action:PayloadAction<UserInfo>) => {
-      draft.usersInfo.set(action.payload.id, action.payload);
+      console.log(action);
+      draft.usersInfo[action.payload.id] =  action.payload;
     },
     updateUserData: (draft, action:PayloadAction<IUserData>) => {
-      draft.usersData.set(action.payload.id, action.payload);
+      draft.usersData[action.payload.id] = action.payload;
     },
     setCurrentUserId: (draft, action:PayloadAction<number>) => {
       draft.currentUserId = action.payload;
+    },
+    updateUserAccessToken: (draft, action:PayloadAction<string>) => {
+      draft.userAccessToken = action.payload;
     },
   },
 });

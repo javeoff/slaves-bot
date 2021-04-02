@@ -1,26 +1,67 @@
-import { FC } from 'react';
-import { Avatar, Button, Group, Header, Link, RichCell } from '@vkontakte/vkui';
+import { FC } from "react";
+import {
+  Avatar,
+  Button,
+  Caption,
+  Card,
+  Div,
+  Group,
+  Header,
+  Link,
+  RichCell,
+  Title,
+} from "@vkontakte/vkui";
+import { Icon20LockOutline } from "@vkontakte/icons";
+import { ISlaveWithUserInfo } from "../../common/types/ISlaveWithUserInfo";
 
-export const SlavesList: FC = () => (
-  <Group
-    header={
-      <Header aside={<Link href='/'>Пригласить друзей</Link>}>Ваши рабы</Header>
-    }
-  >
-    <RichCell
-      style={{ marginTop: 20 }}
-      disabled={true}
-      multiline={true}
-      before={<Avatar size={48} />}
-      caption={<div>На работе В монастыре</div>}
-      after='+ 1 500 ₽ / час'
-      actions={
-        <>
-          <Button mode='secondary'>Купить наручники за 200 ₽</Button>
-        </>
-      }
-    >
-      Кирилл Новак
-    </RichCell>
+interface IProps {
+  slaves: ISlaveWithUserInfo[];
+  slavesCount: number;
+}
+
+export const SlavesList: FC<IProps> = ({ slaves, slavesCount }) => (
+  <Group>
+    <Header mode="primary" indicator={slavesCount}>
+      Рабы
+    </Header>
+    <div style={{ marginBottom: 12 }}>
+      {slaves.map((slave) => {
+        return (
+          <Div key={"slave_" + slave.user_info.id} style={{ paddingBottom: 0 }}>
+            <Card mode="shadow">
+              <Div style={{ display: "flex", alignItems: "center" }}>
+                <Avatar src={slave.user_info.photo_100} size={48}></Avatar>
+                <div style={{ marginLeft: 12, flex: 2 }}>
+                  <Title level="3" weight="medium">
+                    {slave.user_info.first_name} {slave.user_info.last_name}
+                  </Title>
+                  {slave.slave_object.job.name !== "" && (
+                    <Caption
+                      level="1"
+                      weight="regular"
+                      style={{ color: "#707070" }}
+                    >
+                      {slave.slave_object.job.name}
+                    </Caption>
+                  )}
+                </div>
+                <div>
+                  <Title level="3" weight="bold" style={{ color: "#44CC50" }}>
+                    + {slave.slave_object.profit_per_min} ₽ / мин.
+                  </Title>
+                </div>
+                {slave.slave_object.fetter_to
+                  ? Date.now() / 1000 < slave.slave_object.fetter_to && (
+                      <div style={{ marginLeft: 12 }}>
+                        <Icon20LockOutline fill="#E64646" />
+                      </div>
+                    )
+                  : null}
+              </Div>
+            </Card>
+          </Div>
+        );
+      })}
+    </div>
   </Group>
 );

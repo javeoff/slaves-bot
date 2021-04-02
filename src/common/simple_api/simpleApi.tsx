@@ -12,7 +12,7 @@ class SimpleApi {
     this.authorizationToken = authToken;
   }
 
-  callApi<T>(methodName: String, options: AxiosRequestConfig): Promise<T> {
+  callApi<T>(methodName: string, options: AxiosRequestConfig): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       axios(this.endPoint + "/" + methodName, {
         ...options,
@@ -33,9 +33,7 @@ class SimpleApi {
             reject(e);
           }
         })
-        .catch((e) => {
-          reject(e);
-        });
+        .catch(reject);
     });
   }
 
