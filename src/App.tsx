@@ -36,7 +36,11 @@ import Loading from "./panels/Loading";
 import { simpleApi } from "./common/simple_api/simpleApi";
 import { withAppState, IWithAppState } from "./features/App/hocs/withAppState";
 
-const App: FC<IWithAppState> = ({ updateUserInfo }) => {
+const App: FC<IWithAppState> = ({
+  updateUserInfo,
+  updateUserData,
+  updateSlave,
+}) => {
   const location = useLocation();
   const [fetchedUser, setUser] = useState<UserInfo | null>(null);
   const [appLoaded, setAppLoaded] = useState<Boolean>(false);
@@ -55,10 +59,14 @@ const App: FC<IWithAppState> = ({ updateUserInfo }) => {
           // Затем этого юзера надо будет передать главной панели  через redux hook'и
           setUser(user);
           setAppLoaded(true);
-          updateUserInfo({
-            user_info: user,
-            slave_object: u.user,
-            slaves_list: u.slaves,
+
+          updateUserInfo(user);
+          updateSlave(u.user);
+          let slaveIds: number[] = [];
+          u.slaves.forEach((slave) => slaveIds.push(slave.id));
+          updateUserData({
+            id: user.id,
+            slaveIds: slaveIds,
           });
         })
         .catch((e) => {
