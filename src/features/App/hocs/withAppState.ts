@@ -25,12 +25,19 @@ const mapStateToCurrentUserProps = (state:IRootState) => {
       userSlavesInfo[slaveId] = {...state.app.usersInfo[slaveId]};
     }
   }
-  console.log("In map state to props", state.app.slaves);
   return {
     userInfo: state.app.usersInfo[state.app.currentUserId],
     userSlaves,
     userSlavesInfo,
     userSlave: state.app.slaves[state.app.currentUserId],
+  }
+}
+
+const mapStateToUserProps = (state:IRootState) => {
+  return {
+    currentUserInfo: state.app.usersInfo[state.app.currentUserId],
+    usersInfo: state.app.usersInfo,
+    slaves: state.app.slaves,
   }
 }
 
@@ -50,10 +57,18 @@ export type IWithAppState = ReturnType<typeof mapStateToProps> &
 export type IWithCurrentUserInfo = ReturnType<typeof mapStateToCurrentUserProps> &
   ReturnType<typeof mapDispatchToProps>;
 
+  
+export type IWithUserInfo = ReturnType<typeof mapStateToUserProps> &
+  ReturnType<typeof mapDispatchToProps>;
+
 export const withAppState: InferableComponentEnhancer<IWithAppState> = (
   component,
 ) => connect(mapStateToProps, mapDispatchToProps)(component);
 
 export const withCurrentUserInfo:InferableComponentEnhancer<IWithCurrentUserInfo> = (component,) => (
   connect(mapStateToCurrentUserProps, mapDispatchToProps)(component)
+)
+
+export const withUserInfo:InferableComponentEnhancer<IWithUserInfo> = (component,) => (
+  connect(mapStateToUserProps, mapDispatchToProps)(component)
 )

@@ -44,6 +44,14 @@ class SimpleApi {
       },
     });
   }
+
+  getUser(userId: number): Promise<IUserDataResponseDto> {
+    return this.callApi<IUserDataResponseDto>("user", {
+      params: {
+        id: userId,
+      },
+    });
+  }
 }
 
 export const simpleApi = new SimpleApi(

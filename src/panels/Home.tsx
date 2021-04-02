@@ -33,7 +33,6 @@ const Home: FC<IProps> = ({
   return (
     <Panel id={id}>
       <PanelHeader>Рабы</PanelHeader>
-      <Group title="Рабы"></Group>
       <UserHeader user={userInfo} slave={userSlave} isMe={true}></UserHeader>
       <SlavesList
         slavesCount={userSlave.slaves_count}
