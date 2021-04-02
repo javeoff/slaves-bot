@@ -5,3 +5,7 @@ export interface IUserDataResponseDto {
   user: ISlaveData;
   slaves: ISlaveData[];
 }
+export interface IUserActionResponseDto {
+  user: ISlaveData;
+  slave: ISlaveData;
+}

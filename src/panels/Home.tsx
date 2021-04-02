@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
-import { Group } from "@vkontakte/vkui";
+import { Group, PullToRefresh } from "@vkontakte/vkui";
 
 import {
   IWithCurrentUserInfo,
@@ -10,34 +10,70 @@ import {
 import { UserHeader } from "../components/UserHeader/UserHeader";
 import { SlavesList } from "../components/SlavesList/SlavesList";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
+import { AnyFunction } from "@vkontakte/vkjs";
+import { simpleApi } from "../common/simple_api/simpleApi";
+import { Icon56UserCircleOutline } from "@vkontakte/icons";
+import { PageParams, useRouter } from "@happysanta/router";
+import { MODAL_ERROR_CARD } from "../modals/Error";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
+  onRefresh: AnyFunction;
+  isFetching: boolean;
+  params: PageParams;
 }
 
 const Home: FC<IProps> = ({
   id,
   userInfo,
+  masterInfo,
   userSlave,
   userSlaves,
   userSlavesInfo,
+  onRefresh,
+  updateSlaves,
+  isFetching,
 }) => {
   let generatedSlavesList: ISlaveWithUserInfo[] = [];
+  let router = useRouter();
+
   for (let slaveId in userSlaves) {
     generatedSlavesList.push({
       user_info: userSlavesInfo[slaveId],
       slave_object: userSlaves[slaveId],
     });
   }
-  console.log("Generated", generatedSlavesList, userSlaves);
+
+  const buySlave = () => {
+    simpleApi
+      .buySlave(userSlave.id)
+      .then((res) => {
+        updateSlaves([res.user, res.slave]);
+      })
+      .catch((e) => {
+        router.pushModal(MODAL_ERROR_CARD, {
+          message: e.message,
+        });
+      });
+  };
+
   return (
     <Panel id={id}>
       <PanelHeader>Рабы</PanelHeader>
-      <UserHeader user={userInfo} slave={userSlave} isMe={true}></UserHeader>
-      <SlavesList
-        slavesCount={userSlave.slaves_count}
-        slaves={generatedSlavesList}
-      ></SlavesList>
+      <PullToRefresh isFetching={isFetching} onRefresh={onRefresh}>
+        <UserHeader
+          master={masterInfo}
+          user={userInfo}
+          slave={userSlave}
+          isMe={true}
+          onBuySelf={buySlave}
+        ></UserHeader>
+        <SlavesList
+          slavesCount={userSlave.slaves_count}
+          slaves={generatedSlavesList}
+          isMe={true}
+        ></SlavesList>
+      </PullToRefresh>
     </Panel>
   );
 };

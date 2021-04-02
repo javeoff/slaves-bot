@@ -25,7 +25,7 @@ export const routes = {
   [PAGE_RATING]: new Page(PANEL_RATING, VIEW_RATING),
   [PAGE_MARKET_USER]: new Page(PANEL_MARKET_USER, VIEW_MARKET),
   [PAGE_RATING_USER]: new Page(PANEL_RATING_USER, VIEW_RATING),
-  [PAGE_USER]: new Page(PANEL_MAIN_USER, VIEW_MAIN),
+  [PAGE_USER]: new Page(PANEL_MAIN_USER, VIEW_MAIN).makeInfinity(),
 };
 
 export const router = new Router(routes);

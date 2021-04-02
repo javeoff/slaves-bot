@@ -2,6 +2,7 @@
 import { UserInfo } from "@vkontakte/vk-bridge";
 import { connect, InferableComponentEnhancer } from "react-redux";
 import { Dispatch } from "redux";
+import { DefaultUserInfo } from "../../../common/defaults";
 import { IRootState } from "../../../common/redux/store";
 import { ISlaveData } from "../../../common/types/ISlaveData";
 import { IUserData } from "../../../common/types/IUserData";
@@ -30,6 +31,7 @@ const mapStateToCurrentUserProps = (state:IRootState) => {
     userSlaves,
     userSlavesInfo,
     userSlave: state.app.slaves[state.app.currentUserId],
+    masterInfo: state.app.slaves[state.app.currentUserId] && state.app.slaves[state.app.currentUserId].master_id ? state.app.usersInfo[state.app.slaves[state.app.currentUserId].master_id] : DefaultUserInfo,
   }
 }
 
@@ -43,10 +45,12 @@ const mapStateToUserProps = (state:IRootState) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   updateUserInfo: (user: UserInfo) => dispatch(appSlice.actions.updateUserInfo(user)),
+  updateUsersInfo: (users: UserInfo[]) => dispatch(appSlice.actions.updateUsersInfo(users)),
   updateSlave: (slave: ISlaveData) => dispatch(appSlice.actions.updateSlave(slave)),
   updateUserData: (userData: IUserData) => dispatch(appSlice.actions.updateUserData(userData)),
   setCurrentUserId: (userId: number) => dispatch(appSlice.actions.setCurrentUserId(userId)),
   updateUserAccessToken: (token: string) => dispatch(appSlice.actions.updateUserAccessToken(token)),
+  updateSlaves: (slaves: ISlaveData[]) => dispatch(appSlice.actions.updateSlaves(slaves))
 });
 
 

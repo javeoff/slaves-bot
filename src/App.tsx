@@ -4,8 +4,22 @@ import View from "@vkontakte/vkui/dist/components/View/View";
 
 import "@vkontakte/vkui/dist/vkui.css";
 
-import { AdaptivityProvider, Tabbar, TabbarItem } from "@vkontakte/vkui";
-import { useLocation } from "@happysanta/router";
+import {
+  AdaptivityProvider,
+  Button,
+  ModalCard,
+  ModalRoot,
+  Panel,
+  Tabbar,
+  TabbarItem,
+} from "@vkontakte/vkui";
+import {
+  getInfinityPanelId,
+  isInfinityPanel,
+  useLocation,
+  useParams,
+  useRouter,
+} from "@happysanta/router";
 import { Epic } from "@vkontakte/vkui/dist/components/Epic/Epic";
 
 import {
@@ -26,6 +40,7 @@ import {
   Icon28FavoriteOutline,
   Icon28MarketOutline,
   Icon28UserCircleOutline,
+  Icon56ErrorOutline,
 } from "@vkontakte/icons";
 
 import Home from "./panels/Home";
@@ -36,21 +51,60 @@ import Loading from "./panels/Loading";
 import { simpleApi } from "./common/simple_api/simpleApi";
 import { withAppState, IWithAppState } from "./features/App/hocs/withAppState";
 import { bridgeClient } from "./common/bridge/bridge";
+import { ModalError, MODAL_ERROR_CARD } from "./modals/Error";
+import { ModalGiveJob, MODAL_GIVE_JOB_CARD } from "./modals/GiveJob";
 
 const App: FC<IWithAppState> = ({
   updateUserInfo,
   updateSlave,
   setCurrentUserId,
   updateUserAccessToken,
+  updateSlaves,
+  updateUsersInfo,
 }) => {
   const location = useLocation();
-  const [appLoaded, setAppLoaded] = useState<Boolean>(false);
+  const router = useRouter();
+
+  const [appLoaded, setAppLoaded] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const LOADING_PANEL = "loading";
 
+  const reloadUserInformation = async (fetch: boolean = false) => {
+    const user = await bridgeClient.getUserInfo();
+    let refId = +document.location.href.split("#")[1].replace("r", "");
+    if (isNaN(refId)) refId = 0;
+    if (fetch) setIsFetching(true);
+    await simpleApi
+      .startApp(refId)
+      .then(async (u) => {
+        setCurrentUserId(user.id);
+        updateUserInfo(user);
+        updateSlave(u.user);
+
+        let slaveIds: number[] = [];
+        u.slaves.forEach((slave) => slaveIds.push(slave.id));
+        let users = await bridgeClient.getUsersByIds(slaveIds);
+        if (u.user.master_id != 0) {
+          let masterInfo = await bridgeClient.getUsersByIds([
+            u.user.master_id,
+            -1,
+          ]);
+          updateUsersInfo([masterInfo[0]]);
+        }
+        updateUsersInfo(users);
+        updateSlaves(u.slaves);
+        setAppLoaded(true);
+        if (fetch) setIsFetching(false);
+      })
+      .catch((e) => {
+        console.error(e);
+        if (fetch) setIsFetching(false);
+      });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      const user = await bridgeClient.getUserInfo();
       let userToken = "";
       while (true) {
         // Получаем токен, пока не получим
@@ -61,71 +115,22 @@ const App: FC<IWithAppState> = ({
           userToken = userTokenData.access_token;
         }
         if (userToken) break;
+        updateUserAccessToken(userToken);
       }
       bridgeClient.setAccessToken(userToken);
-      const refId = +document.location.href.split("#")[1].replace("r", "");
-      await simpleApi
-        .startApp(refId)
-        .then(async (u) => {
-          u.slaves = [
-            {
-              id: 587340079,
-              profit_per_min: 2240,
-              job: {
-                name: "",
-              },
-              slaves_profit_per_min: 20,
-              slaves_count: 6520,
-              price: 54,
-              sale_price: 60,
-              master_id: user.id,
-              fetter_to: 0,
-              fetter_price: 0,
-              last_time_update: 0,
-              balance: 0,
-            },
-            {
-              id: 1,
-              profit_per_min: 2240,
-              job: {
-                name: "",
-              },
-              slaves_profit_per_min: 20,
-              slaves_count: 6520,
-              price: 54,
-              sale_price: 60,
-              master_id: user.id,
-              fetter_to: 0,
-              fetter_price: 0,
-              last_time_update: 0,
-              balance: 0,
-            },
-          ];
-          updateUserAccessToken(userToken);
-          setCurrentUserId(user.id);
-          updateUserInfo(user);
-          updateSlave(u.user);
-
-          let slaveIds: number[] = [];
-          u.slaves.forEach((slave) => slaveIds.push(slave.id));
-
-          let users = await bridgeClient.getUsersByIds(slaveIds);
-
-          users.forEach((user) => {
-            updateUserInfo(user);
-          });
-          u.slaves.forEach((slave) => {
-            updateSlave(slave);
-          });
-
-          setAppLoaded(true);
-        })
-        .catch((e) => {
-          console.error(e);
-        });
+      reloadUserInformation();
     };
     void fetchData();
   }, []);
+
+  const modal = (
+    <ModalRoot activeModal={location.getModalId()}>
+      <ModalError onClose={() => router.popPage()} id={MODAL_ERROR_CARD} />
+      <ModalGiveJob onClose={() => router.popPage()} id={MODAL_GIVE_JOB_CARD} />
+    </ModalRoot>
+  );
+
+  console.log(router, location.getViewActivePanel(VIEW_MAIN));
 
   return (
     <AdaptivityProvider>
@@ -165,24 +170,44 @@ const App: FC<IWithAppState> = ({
           )
         }
       >
-        <View id={LOADING_PANEL} activePanel={LOADING_PANEL}>
+        <View
+          id={LOADING_PANEL}
+          modal={modal}
+          activePanel={String(LOADING_PANEL)}
+        >
           <Loading id={LOADING_PANEL} />
         </View>
         <View
           id={VIEW_MAIN}
+          modal={modal}
           activePanel={String(location.getViewActivePanel(VIEW_MAIN))}
         >
-          <Home id={PANEL_MAIN} />
-          <User id={PANEL_MAIN_USER} />
+          <Home
+            id={PANEL_MAIN}
+            onRefresh={(e) => reloadUserInformation(true)}
+            isFetching={isFetching}
+            params={useParams()}
+          />
+          {[...router.getInfinityPanelList(VIEW_MAIN)].map((panelId) => {
+            if (isInfinityPanel(panelId)) {
+              const type = getInfinityPanelId(panelId);
+              if (type === PANEL_MAIN_USER) {
+                return <User key={panelId} id={panelId}></User>;
+              }
+            }
+            return null;
+          })}
         </View>
         <View
           id={VIEW_MARKET}
+          modal={modal}
           activePanel={String(location.getViewActivePanel(VIEW_MARKET))}
         >
           <Market id={PANEL_MARKET} />
         </View>
         <View
           id={VIEW_RATING}
+          modal={modal}
           activePanel={String(location.getViewActivePanel(VIEW_RATING))}
         >
           <Rating id={PANEL_RATING} />

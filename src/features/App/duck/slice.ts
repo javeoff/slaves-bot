@@ -26,6 +26,16 @@ export const appSlice = createSlice({
     updateSlave: (draft, action:PayloadAction<ISlaveData>) => {
       draft.slaves[action.payload.id] = action.payload;
     },
+    updateSlaves: (draft, action:PayloadAction<ISlaveData[]>) => {
+      action.payload.forEach(slave => {
+        draft.slaves[slave.id] = slave;
+      })
+    },
+    updateUsersInfo: (draft, action:PayloadAction<UserInfo[]>) => {
+      action.payload.forEach(user => {
+        draft.usersInfo[user.id] = user;
+      })
+    },
     updateUserInfo: (draft, action:PayloadAction<UserInfo>) => {
       console.log(action);
       draft.usersInfo[action.payload.id] =  action.payload;

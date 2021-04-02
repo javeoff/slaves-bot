@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { IUserDataResponseDto } from "./types";
+import { IUserActionResponseDto, IUserDataResponseDto } from "./types";
 
 const API_ENDPOINT = "https://mydzin.ru/api";
 
@@ -49,6 +49,39 @@ class SimpleApi {
     return this.callApi<IUserDataResponseDto>("user", {
       params: {
         id: userId,
+      },
+    });
+  }
+
+  buySlave(slaveId: number): Promise<IUserActionResponseDto> {
+    return this.callApi<IUserActionResponseDto>("buySlave", {
+      params: {
+        slave_id: slaveId,
+      },
+    });
+  }
+
+  fetterSlave(slaveId: number): Promise<IUserActionResponseDto> {
+    return this.callApi<IUserActionResponseDto>("fetterSlave", {
+      params: {
+        slave_id: slaveId,
+      },
+    });
+  }
+
+  sellSlave(slaveId: number): Promise<IUserActionResponseDto> {
+    return this.callApi<IUserActionResponseDto>("sellSlave", {
+      params: {
+        slave_id: slaveId,
+      },
+    });
+  }
+
+  jobSlave(slaveId: number, jobName: string): Promise<IUserActionResponseDto> {
+    return this.callApi<IUserActionResponseDto>("jobSlave", {
+      params: {
+        slave_id: slaveId,
+        job_name: jobName,
       },
     });
   }
