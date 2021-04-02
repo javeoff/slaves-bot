@@ -57,63 +57,6 @@ interface IProps extends IWithUserInfo {
   key: string;
 }
 
-const kirill = {
-  id: 2,
-  first_name: "Кирилл",
-  last_name: "Новак",
-  photo_200:
-    "https://sun9-53.userapi.com/s/v1/ig2/7TOOR_yziUBmT31673uENDtn-39pTbQt1b28QA1hai3aWfJYE499q3MxFHt2YQljJ_5Q2rLbCjwXpT9E6UoP9Tno.jpg?size=200x0&quality=96&crop=0,0,1024,1024&ava=1",
-  slave_object: {
-    id: 1,
-    profit_per_min: 10,
-    job: {
-      name: "Блогер",
-    },
-    master_id: 0,
-    fetter_to: 1617308426028,
-    fetter_price: 0,
-    sale_price: 0,
-    price: 50,
-    slaves_count: 10000,
-    slaves_profit_per_min: 2 ** 32,
-    balance: 2 ** 32,
-    lst_time_update: 0,
-  },
-};
-
-const user = {
-  user_info: {
-    id: 1,
-    first_name: "Даниил",
-    last_name: "Джейв",
-    photo_200:
-      "https://sun9-57.userapi.com/s/v1/ig2/CEsb2eYW3D2-jZhBJ2GLXj484UYpSC50pCCgG4gqNZBR0WTOBQhlHq21-S-WxuFV7OH2lENOzWFAv3Tdo3-oLQ6b.jpg?size=50x0&quality=96&crop=126,124,748,748&ava=1",
-    photo_100:
-      "https://sun9-57.userapi.com/s/v1/ig2/CEsb2eYW3D2-jZhBJ2GLXj484UYpSC50pCCgG4gqNZBR0WTOBQhlHq21-S-WxuFV7OH2lENOzWFAv3Tdo3-oLQ6b.jpg?size=50x0&quality=96&crop=126,124,748,748&ava=1",
-    sex: 1,
-    country: 0,
-    city: 0,
-    timezone: 0,
-  },
-  slave_object: {
-    id: 1,
-    profit_per_min: 1000,
-    job: {
-      name: "Уборщик",
-    },
-    master_id: 0,
-    fetter_to: 0,
-    fetter_price: 0,
-    sale_price: 0,
-    price: 50,
-    slaves_count: 10000,
-    slaves_profit_per_min: 2 ** 32,
-    balance: 2 ** 32,
-    lst_time_update: 0,
-  },
-  slaves_list: [kirill, kirill, kirill, kirill, kirill, kirill],
-};
-
 const User: FC<IProps> = ({
   id: panelId,
   usersInfo,

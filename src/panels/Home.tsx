@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
-import { Group, PullToRefresh } from "@vkontakte/vkui";
+import { Div, FixedLayout, Group, PullToRefresh } from "@vkontakte/vkui";
 
 import {
   IWithCurrentUserInfo,
@@ -15,6 +15,7 @@ import { simpleApi } from "../common/simple_api/simpleApi";
 import { Icon56UserCircleOutline } from "@vkontakte/icons";
 import { PageParams, useRouter } from "@happysanta/router";
 import { MODAL_ERROR_CARD } from "../modals/Error";
+import { getSubDate } from "../common/helpers";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
@@ -73,6 +74,24 @@ const Home: FC<IProps> = ({
           slaves={generatedSlavesList}
           isMe={true}
         ></SlavesList>
+        <FixedLayout vertical="bottom">
+          <Div style={{ paddingBottom: 0 }}>
+            {userSlave.fetter_to >= Date.now() / 1000 && (
+              <Div
+                style={{
+                  marginBottom: 8,
+                  width: "100%",
+                  opacity: 1,
+                  color: "red",
+                  textAlign: "center",
+                }}
+              >
+                В цепях будет еще{" "}
+                {getSubDate(new Date(userSlave.fetter_to * 1000))}
+              </Div>
+            )}
+          </Div>
+        </FixedLayout>
       </PullToRefresh>
     </Panel>
   );

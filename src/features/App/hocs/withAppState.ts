@@ -1,4 +1,3 @@
-
 import { UserInfo } from "@vkontakte/vk-bridge";
 import { connect, InferableComponentEnhancer } from "react-redux";
 import { Dispatch } from "redux";
@@ -7,23 +6,23 @@ import { IRootState } from "../../../common/redux/store";
 import { ISlaveData } from "../../../common/types/ISlaveData";
 import { IUserData } from "../../../common/types/IUserData";
 import { appSelector } from "../duck/selectors";
-import { appSlice} from "../duck/slice";
+import { appSlice } from "../duck/slice";
 
 const mapStateToProps = (state: IRootState) => ({
   app: appSelector(state),
 });
 
-const mapStateToCurrentUserProps = (state:IRootState) => {
-  let userSlaves:Record<number, ISlaveData> = {};
+const mapStateToCurrentUserProps = (state: IRootState) => {
+  let userSlaves: Record<number, ISlaveData> = {};
   for (let slaveId in state.app.slaves) {
     if (state.app.slaves[slaveId].master_id == state.app.currentUserId) {
-      userSlaves[slaveId] = {...state.app.slaves[slaveId]};
+      userSlaves[slaveId] = { ...state.app.slaves[slaveId] };
     }
   }
-  let userSlavesInfo:Record<number, UserInfo> = {};
+  let userSlavesInfo: Record<number, UserInfo> = {};
   for (let slaveId in state.app.slaves) {
     if (state.app.slaves[slaveId].master_id == state.app.currentUserId) {
-      userSlavesInfo[slaveId] = {...state.app.usersInfo[slaveId]};
+      userSlavesInfo[slaveId] = { ...state.app.usersInfo[slaveId] };
     }
   }
   return {
@@ -31,48 +30,76 @@ const mapStateToCurrentUserProps = (state:IRootState) => {
     userSlaves,
     userSlavesInfo,
     userSlave: state.app.slaves[state.app.currentUserId],
-    masterInfo: state.app.slaves[state.app.currentUserId] && state.app.slaves[state.app.currentUserId].master_id ? state.app.usersInfo[state.app.slaves[state.app.currentUserId].master_id] : DefaultUserInfo,
-  }
-}
+    masterInfo:
+      state.app.slaves[state.app.currentUserId] &&
+      state.app.slaves[state.app.currentUserId].master_id
+        ? state.app.usersInfo[
+            state.app.slaves[state.app.currentUserId].master_id
+          ]
+        : DefaultUserInfo,
+  };
+};
 
-const mapStateToUserProps = (state:IRootState) => {
+const mapStateToUserProps = (state: IRootState) => {
   return {
     currentUserInfo: state.app.usersInfo[state.app.currentUserId],
     usersInfo: state.app.usersInfo,
     slaves: state.app.slaves,
-  }
-}
+  };
+};
+
+const mapStateToMarketProps = (state: IRootState) => {
+  return {
+    userInfo: state.app.usersInfo[state.app.currentUserId],
+    friends: state.app.friends,
+  };
+};
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  updateUserInfo: (user: UserInfo) => dispatch(appSlice.actions.updateUserInfo(user)),
-  updateUsersInfo: (users: UserInfo[]) => dispatch(appSlice.actions.updateUsersInfo(users)),
-  updateSlave: (slave: ISlaveData) => dispatch(appSlice.actions.updateSlave(slave)),
-  updateUserData: (userData: IUserData) => dispatch(appSlice.actions.updateUserData(userData)),
-  setCurrentUserId: (userId: number) => dispatch(appSlice.actions.setCurrentUserId(userId)),
-  updateUserAccessToken: (token: string) => dispatch(appSlice.actions.updateUserAccessToken(token)),
-  updateSlaves: (slaves: ISlaveData[]) => dispatch(appSlice.actions.updateSlaves(slaves))
+  updateUserInfo: (user: UserInfo) =>
+    dispatch(appSlice.actions.updateUserInfo(user)),
+  updateUsersInfo: (users: UserInfo[]) =>
+    dispatch(appSlice.actions.updateUsersInfo(users)),
+  updateSlave: (slave: ISlaveData) =>
+    dispatch(appSlice.actions.updateSlave(slave)),
+  updateUserData: (userData: IUserData) =>
+    dispatch(appSlice.actions.updateUserData(userData)),
+  setCurrentUserId: (userId: number) =>
+    dispatch(appSlice.actions.setCurrentUserId(userId)),
+  updateUserAccessToken: (token: string) =>
+    dispatch(appSlice.actions.updateUserAccessToken(token)),
+  updateSlaves: (slaves: ISlaveData[]) =>
+    dispatch(appSlice.actions.updateSlaves(slaves)),
+  updateFriends: (friends: UserInfo[]) =>
+    dispatch(appSlice.actions.updateFriends(friends)),
 });
-
-
 
 export type IWithAppState = ReturnType<typeof mapStateToProps> &
   ReturnType<typeof mapDispatchToProps>;
 
-export type IWithCurrentUserInfo = ReturnType<typeof mapStateToCurrentUserProps> &
+export type IWithCurrentUserInfo = ReturnType<
+  typeof mapStateToCurrentUserProps
+> &
   ReturnType<typeof mapDispatchToProps>;
 
-  
 export type IWithUserInfo = ReturnType<typeof mapStateToUserProps> &
   ReturnType<typeof mapDispatchToProps>;
 
+export type IWithFriends = ReturnType<typeof mapStateToMarketProps> &
+  ReturnType<typeof mapDispatchToProps>;
+
 export const withAppState: InferableComponentEnhancer<IWithAppState> = (
-  component,
+  component
 ) => connect(mapStateToProps, mapDispatchToProps)(component);
 
-export const withCurrentUserInfo:InferableComponentEnhancer<IWithCurrentUserInfo> = (component,) => (
-  connect(mapStateToCurrentUserProps, mapDispatchToProps)(component)
-)
+export const withCurrentUserInfo: InferableComponentEnhancer<IWithCurrentUserInfo> = (
+  component
+) => connect(mapStateToCurrentUserProps, mapDispatchToProps)(component);
 
-export const withUserInfo:InferableComponentEnhancer<IWithUserInfo> = (component,) => (
-  connect(mapStateToUserProps, mapDispatchToProps)(component)
-)
+export const withUserInfo: InferableComponentEnhancer<IWithUserInfo> = (
+  component
+) => connect(mapStateToUserProps, mapDispatchToProps)(component);
+
+export const withMarketState: InferableComponentEnhancer<IWithFriends> = (
+  component
+) => connect(mapStateToMarketProps, mapDispatchToProps)(component);
