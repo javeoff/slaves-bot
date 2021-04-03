@@ -16,6 +16,7 @@ import { Icon56UserCircleOutline } from "@vkontakte/icons";
 import { PageParams, useRouter } from "@happysanta/router";
 import { MODAL_ERROR_CARD } from "../modals/Error";
 import { getSubDate } from "../common/helpers";
+import { InfoBlock } from "../components/InfoBlock/InfoBlock";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
@@ -69,6 +70,9 @@ const Home: FC<IProps> = ({
           isMe={true}
           onBuySelf={buySlave}
         ></UserHeader>
+        <Div>
+          <InfoBlock title="Саси писю" subtitle="Ага ага"></InfoBlock>
+        </Div>
         {userSlave.fetter_to >= Date.now() / 1000 && (
           <Div
             style={{

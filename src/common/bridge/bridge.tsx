@@ -50,6 +50,7 @@ class BridgeClient {
     return this.apiCall("friends.get", {
       user_id,
       fields: "photo_100",
+      count: 100,
     }).then((res) => {
       return res.response.items.map((friend: Record<any, any>) => {
         return {

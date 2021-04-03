@@ -1,0 +1,11 @@
+.info-block {
+  padding: 24px;
+  border-radius: 18px;
+  background-color: var(--content_tint_backgroun);
+  color: var(--text_primary);
+}
+
+.info-block.variant--blue {
+  background-color: #3f8ae0;
+  color: #fff;
+}

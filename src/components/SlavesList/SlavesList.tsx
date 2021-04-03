@@ -30,6 +30,7 @@ interface IProps {
   showPosition?: boolean;
   label?: "slaves_count" | "job_name";
   showProfitPerMin?: boolean;
+  showPrice?: boolean;
 }
 
 type CustomClick = { target: HTMLElement };
@@ -42,6 +43,7 @@ export const SlavesList: FC<IProps> = ({
   showPosition = false,
   label = "job_name",
   showProfitPerMin = true,
+  showPrice = false,
 }) => {
   let router = useRouter();
   const openGiveJobModal = (slaveId: number) => {
@@ -130,6 +132,17 @@ export const SlavesList: FC<IProps> = ({
                         })}
                       >
                         {slave.slave_object.profit_per_min} ₽ / мин.
+                      </Title>
+                    </div>
+                  )}
+                  {showPrice && (
+                    <div>
+                      <Title
+                        level="3"
+                        weight="bold"
+                        className="slave-list-item--profit green"
+                      >
+                        {slave.slave_object.price} ₽
                       </Title>
                     </div>
                   )}

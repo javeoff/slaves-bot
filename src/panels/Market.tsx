@@ -34,91 +34,103 @@ const Market: FC<IProps> = ({
   updateUsersInfo,
   updateSlaves,
 }) => {
-  let [marketList, setMarketList] = useState<ISlaveWithUserInfo[]>([]);
-  let [loadedFirendsInfo, setLoadedFriendsInfo] = useState<boolean>(false);
-  let [loadedFirendsSlaves, setLoadedFriendsSlaves] = useState<boolean>(false);
+  let [marketList, setMarketList] = useState<ISlaveWithUserInfo[]>();
+  let [loadedFriendsInfo, setLoadedFriendsInfo] = useState<boolean>(false);
+  let [loadedFriendsSlaves, setLoadedFriendsSlaves] = useState<boolean>(false);
   let [loading, setLoading] = useState<boolean>(true);
 
   let [isFetching, setFetching] = useState<boolean>(false);
 
-  const getFriends = async () => {
-    if (!Object.keys(friends).length) {
-      let newFriends = await bridgeClient.getUserFriends(userInfo.id);
-      console.log("got friends", newFriends);
-      updateFriends(newFriends.slice(0, 250).map((f) => f.id));
-      updateUsersInfo(newFriends);
-      setLoadedFriendsInfo(true);
-    }
-  };
-
-  const loadSlaves = async () => {
-    await simpleApi
-      .getSlaves(friends)
-      .then((res) => {
-        updateSlaves(res);
+  const reloadFriends = async () => {
+    await bridgeClient
+      .getUserFriends(userInfo.id)
+      .then(async (newFriends) => {
+        newFriends = newFriends.slice(0, 250);
+        let friendsByKeys: Record<number, UserInfo> = {};
+        let friendsIds = newFriends.map((fr) => {
+          friendsByKeys[fr.id] = fr;
+          return fr.id;
+        });
+        updateFriends(friendsIds);
+        updateUsersInfo(newFriends);
+        setLoadedFriendsInfo(true);
+        let newFriendsSlaves = await simpleApi.getSlaves(friendsIds);
+        updateSlaves(newFriendsSlaves);
+        console.log(friendsByKeys);
+        let marketList: ISlaveWithUserInfo[] = newFriendsSlaves.map(
+          (friendSlave) => {
+            return {
+              user_info: friendsByKeys[friendSlave.id],
+              slave_object: friendSlave,
+            };
+          }
+        );
+        marketList = deleteOwned(marketList);
+        console.log("Set new market list", marketList);
         setLoadedFriendsSlaves(true);
+        setMarketList(marketList);
       })
       .catch(openErrorModal);
   };
 
-  const loadMarket = async () => {
-    if (!friends?.length) {
-      await getFriends();
-    }
-    await loadSlaves();
+  const deleteOwned = (m: ISlaveWithUserInfo[]): ISlaveWithUserInfo[] => {
+    return m.filter((m) => {
+      return m.slave_object.master_id != userInfo.id;
+    });
   };
 
   useEffect(() => {
-    async function initMarket() {
-      await loadMarket();
-    }
-    initMarket();
-  }, []);
-
-  useEffect(() => {
-    const updateMarket = async () => {
-      if (loadedFirendsInfo && loadedFirendsSlaves) {
-        if (!marketList?.length) {
-          const slavesInfo: ISlaveWithUserInfo[] = friends.map((fId) => {
-            return {
-              user_info: usersInfo[fId],
-              slave_object: slaves[fId],
-            };
-          });
-          setMarketList(slavesInfo);
-        }
+    const loadMarket = async () => {
+      if (Object.keys(friends).length) {
+        // Переиспользуем рейтинг
+        let marketList: ISlaveWithUserInfo[] = friends.map((marketSlaveId) => {
+          return {
+            slave_object: slaves[marketSlaveId],
+            user_info: usersInfo[marketSlaveId],
+          };
+        });
+        marketList = deleteOwned(marketList);
+        setLoadedFriendsInfo(true);
+        setLoadedFriendsSlaves(true);
+        setMarketList(marketList);
+      } else {
+        await reloadFriends();
       }
     };
-
-    updateMarket();
-  }, [loadedFirendsInfo, loadedFirendsSlaves]);
+    void loadMarket();
+  }, []); // 1 раз, при открытии топа, грузим инфу о топе
 
   useEffect(() => {
-    if (marketList?.length) {
+    if (loadedFriendsInfo && loadedFriendsSlaves && marketList) {
+      if (isFetching) {
+        setFetching(false);
+      }
       setLoading(false);
     }
-  }, [marketList]);
+  }, [loadedFriendsInfo, loadedFriendsSlaves, marketList]); // Когда меняется информация о прогрессе загрузки
 
-  const refreshRatingUsers = async () => {
+  const refreshMarketUsers = () => {
     setFetching(true);
-    setLoadedFriendsInfo(false);
     setLoadedFriendsSlaves(false);
-    await loadMarket();
+    setLoadedFriendsInfo(false);
+    reloadFriends();
   };
 
   return (
     <Panel id={id}>
+      <PanelHeader>Маркет</PanelHeader>
       {loading ? (
         <PanelSpinner size="large" />
       ) : (
-        <PullToRefresh onRefresh={refreshRatingUsers} isFetching={isFetching}>
-          <PanelHeader>Маркет</PanelHeader>
+        <PullToRefresh onRefresh={refreshMarketUsers} isFetching={isFetching}>
           {marketList?.length ? (
             <SlavesList
               slaves={marketList}
               slavesCount={0}
               showHeader={false}
               isMe={false}
+              showPrice={true}
+              showProfitPerMin={false}
             />
           ) : (
             <Div>
