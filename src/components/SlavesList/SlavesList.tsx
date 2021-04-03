@@ -20,6 +20,7 @@ import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
 
 import "./SlavesList.css";
 import { decOfNum } from "../../common/helpers";
+import { classNames } from "@vkontakte/vkjs";
 
 interface IProps {
   slaves: ISlaveWithUserInfo[];
@@ -55,7 +56,7 @@ export const SlavesList: FC<IProps> = ({
     <Group>
       {showHeader && (
         <Header mode="primary" indicator={slavesCount}>
-          Рабы
+          {isMe ? "Мои рабы" : "Рабов"}
         </Header>
       )}
       <div style={{ marginBottom: 12 }}>
@@ -63,7 +64,7 @@ export const SlavesList: FC<IProps> = ({
           return (
             <Div
               key={"slave_" + slave.user_info.id + "_" + i}
-              style={{ paddingBottom: 0 }}
+              className="slaves-list--item"
             >
               <Card mode="shadow">
                 <Div
@@ -72,14 +73,14 @@ export const SlavesList: FC<IProps> = ({
                       openSlave(slave.slave_object.id);
                     }
                   }}
-                  style={{ display: "flex", alignItems: "center" }}
+                  className="slave-list--item-container"
                 >
                   <Avatar src={slave.user_info.photo_100} size={48}>
                     {showPosition && (
                       <span className="avatar-counter">{i + 1}</span>
                     )}
                   </Avatar>
-                  <div style={{ marginLeft: 12, flex: 2 }}>
+                  <div className="slave-list--item-user-info">
                     <Title level="3" weight="medium">
                       {slave.user_info.first_name} {slave.user_info.last_name}
                     </Title>
@@ -88,7 +89,7 @@ export const SlavesList: FC<IProps> = ({
                         <Caption
                           level="1"
                           weight="regular"
-                          style={{ color: "#707070" }}
+                          className="slave-list--item-user-info-caption"
                         >
                           {slave.slave_object.job.name}
                         </Caption>
@@ -98,7 +99,7 @@ export const SlavesList: FC<IProps> = ({
                       <Caption
                         level="1"
                         weight="regular"
-                        style={{ color: "#707070" }}
+                        className="slave-list--item-user-info-caption"
                       >
                         {slave.slave_object.slaves_count}{" "}
                         {decOfNum(slave.slave_object.slaves_count, [
@@ -111,10 +112,7 @@ export const SlavesList: FC<IProps> = ({
                     {slave.slave_object.job.name === "" && isMe ? (
                       <Button
                         mode="tertiary"
-                        style={{
-                          paddingLeft: 0,
-                          paddingRight: 0,
-                        }}
+                        className="slave-list--item--button"
                         onClick={() => openGiveJobModal(slave.slave_object.id)}
                       >
                         Дать работу
@@ -126,12 +124,10 @@ export const SlavesList: FC<IProps> = ({
                       <Title
                         level="3"
                         weight="bold"
-                        style={{
-                          color:
-                            slave.slave_object.profit_per_min > 0
-                              ? "#44CC50"
-                              : "#ddd",
-                        }}
+                        className={classNames("slave-list-item--profit", {
+                          green: slave.slave_object.profit_per_min > 0,
+                          gray: slave.slave_object.profit_per_min <= 0,
+                        })}
                       >
                         {slave.slave_object.profit_per_min} ₽ / мин.
                       </Title>

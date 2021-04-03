@@ -19,3 +19,45 @@
   margin-right: -4px;
   margin-bottom: -2px;
 }
+
+.slaves-list--item {
+  padding-bottom: 0px;
+  cursor: pointer;
+  max-height: 120px;
+}
+
+.slaves-list--item .Card {
+  max-height: 100%;
+}
+
+.slaves-list--item:active,
+.slaves-list--item:hover {
+  opacity: 0.9;
+}
+
+.slave-list--item-container {
+  display: flex;
+  align-items: center;
+}
+
+.slave-list--item-user-info {
+  margin-left: 12px;
+  flex: 2;
+}
+
+.slave-list--item-user-info-caption {
+  color: #707070;
+}
+
+.slave-list--item--button {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.slave-list-item--profit.green {
+  color: #44CC50;
+}
+
+.slave-list-item--profit.gray {
+  color: #ddd;
+}

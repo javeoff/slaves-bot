@@ -16,7 +16,7 @@ export const ModalError: FC<IProps> = ({ id, onClose }) => {
       id={id}
       onClose={onClose}
       icon={<Icon56ErrorOutline fill="#E64646" />}
-      header="Произошла ошибка"
+      header="Ошибка"
       subheader={message}
       actions={
         <Button size="l" mode="destructive" onClick={onClose}>

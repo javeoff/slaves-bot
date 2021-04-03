@@ -69,11 +69,13 @@ const Home: FC<IProps> = ({
           isMe={true}
           onBuySelf={buySlave}
         ></UserHeader>
-        <SlavesList
-          slavesCount={userSlave.slaves_count}
-          slaves={generatedSlavesList}
-          isMe={true}
-        ></SlavesList>
+        <div style={{ marginBottom: 56 }}>
+          <SlavesList
+            slavesCount={userSlave.slaves_count}
+            slaves={generatedSlavesList}
+            isMe={true}
+          ></SlavesList>
+        </div>
         <FixedLayout vertical="bottom">
           <Div style={{ paddingBottom: 0 }}>
             {userSlave.fetter_to >= Date.now() / 1000 && (
@@ -86,7 +88,7 @@ const Home: FC<IProps> = ({
                   textAlign: "center",
                 }}
               >
-                В цепях будет еще{" "}
+                Вы будете в цепях еще{" "}
                 {getSubDate(new Date(userSlave.fetter_to * 1000))}
               </Div>
             )}
