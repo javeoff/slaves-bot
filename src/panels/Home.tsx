@@ -69,6 +69,20 @@ const Home: FC<IProps> = ({
           isMe={true}
           onBuySelf={buySlave}
         ></UserHeader>
+        {userSlave.fetter_to >= Date.now() / 1000 && (
+          <Div
+            style={{
+              marginBottom: 8,
+              width: "100%",
+              opacity: 1,
+              color: "red",
+              textAlign: "center",
+            }}
+          >
+            Вы будете в цепях еще{" "}
+            {getSubDate(new Date(userSlave.fetter_to * 1000))}
+          </Div>
+        )}
         <div style={{ marginBottom: 56 }}>
           <SlavesList
             slavesCount={userSlave.slaves_count}
@@ -76,24 +90,6 @@ const Home: FC<IProps> = ({
             isMe={true}
           ></SlavesList>
         </div>
-        <FixedLayout vertical="bottom">
-          <Div style={{ paddingBottom: 0 }}>
-            {userSlave.fetter_to >= Date.now() / 1000 && (
-              <Div
-                style={{
-                  marginBottom: 8,
-                  width: "100%",
-                  opacity: 1,
-                  color: "red",
-                  textAlign: "center",
-                }}
-              >
-                Вы будете в цепях еще{" "}
-                {getSubDate(new Date(userSlave.fetter_to * 1000))}
-              </Div>
-            )}
-          </Div>
-        </FixedLayout>
       </PullToRefresh>
     </Panel>
   );

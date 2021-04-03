@@ -8,7 +8,7 @@ const initialState: IAppState = {
   slaves: {},
   usersInfo: {},
   usersData: {},
-  friends: {},
+  friends: [],
   userAccessToken: "",
   rating: [],
 };
@@ -16,7 +16,7 @@ const initialState: IAppState = {
 export interface IAppState {
   currentUserId: number;
   userAccessToken: string;
-  friends: Record<number, UserInfo>;
+  friends: number[];
   rating: number[];
   slaves: Record<number, ISlaveData>; // Объект с информацией о рабах с сервера
   usersInfo: Record<number, UserInfo>; // Объект из {1: UserInfo, 2: UserInfo}
@@ -40,10 +40,8 @@ export const appSlice = createSlice({
         draft.usersInfo[user.id] = user;
       });
     },
-    updateFriends: (draft, action: PayloadAction<UserInfo[]>) => {
-      action.payload.forEach((friend) => {
-        draft.friends[friend.id] = friend;
-      });
+    updateFriends: (draft, action: PayloadAction<number[]>) => {
+      draft.friends = action.payload;
     },
     updateRating: (draft, action: PayloadAction<number[]>) => {
       draft.rating = action.payload

@@ -12,6 +12,7 @@ import { simpleApi } from "../common/simple_api/simpleApi";
 import { openErrorModal } from "../modals/openers";
 import { ISlaveData } from "../common/types/ISlaveData";
 import { Avatar, Caption, Div } from "@vkontakte/vkui";
+import { SlavesList } from "../components/SlavesList/SlavesList";
 
 interface IProps extends IWithFriends {
   id?: string;
@@ -21,10 +22,11 @@ const Market: FC<IProps> = ({
   id,
   friends,
   userInfo,
+  usersInfo,
+  slaves,
   updateFriends,
   updateUsersInfo,
   updateSlaves,
-  slaves,
 }) => {
   let [marketList, setMarketList] = useState<ISlaveWithUserInfo[]>([]);
   let [loadedFirendsInfo, setLoadedFriendsInfo] = useState<boolean>(false);
@@ -34,7 +36,8 @@ const Market: FC<IProps> = ({
     async function getFriends() {
       if (!Object.keys(friends).length) {
         let newFriends = await bridgeClient.getUserFriends(userInfo.id);
-        updateFriends(newFriends);
+        console.log("got friends", newFriends);
+        updateFriends(newFriends.slice(0, 250).map((f) => f.id));
         updateUsersInfo(newFriends);
         setLoadedFriendsInfo(true);
       }
@@ -44,10 +47,9 @@ const Market: FC<IProps> = ({
 
   useEffect(() => {
     const loadSlaves = async () => {
-      let ids = Object.keys(friends).map((f) => +f);
-      if (ids.length) {
+      if (friends.length) {
         await simpleApi
-          .getSlaves(ids)
+          .getSlaves(friends)
           .then((res) => {
             updateSlaves(res);
             setLoadedFriendsSlaves(true);
@@ -60,20 +62,14 @@ const Market: FC<IProps> = ({
 
   useEffect(() => {
     const updateMarket = async () => {
-      const slaves_list = Object.values(slaves);
-      const users_list = Object.values(friends);
-
       if (loadedFirendsInfo && loadedFirendsSlaves) {
         if (!marketList?.length) {
-          const slavesInfo: ISlaveWithUserInfo[] = new Array(slaves_list.length)
-            .fill(null)
-            .map((_, idx) => ({
-              slave_object: slaves_list[idx],
-              user_info: users_list[idx],
-            }));
-
-          console.log(slavesInfo);
-
+          const slavesInfo: ISlaveWithUserInfo[] = friends.map((fId) => {
+            return {
+              user_info: usersInfo[fId],
+              slave_object: slaves[fId],
+            };
+          });
           setMarketList(slavesInfo);
         }
       }
@@ -86,15 +82,12 @@ const Market: FC<IProps> = ({
     <Panel id={id}>
       <PanelHeader>Маркет</PanelHeader>
       {marketList?.length ? (
-        marketList.map((marketItem: ISlaveWithUserInfo) => (
-          <>
-            <div>{marketItem.slave_object.id}</div>
-            <div>{marketItem.user_info?.first_name}</div>
-            <div>
-              <Avatar src={marketItem.user_info?.photo_100} />
-            </div>
-          </>
-        ))
+        <SlavesList
+          slaves={marketList}
+          slavesCount={0}
+          showHeader={false}
+          isMe={false}
+        ></SlavesList>
       ) : (
         <Div>
           <Caption level="1" weight="regular" style={{ textAlign: "center" }}>

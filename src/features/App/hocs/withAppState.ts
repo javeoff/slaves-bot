@@ -53,6 +53,7 @@ const mapStateToMarketProps = (state: IRootState) => {
     userInfo: state.app.usersInfo[state.app.currentUserId],
     friends: state.app.friends,
     slaves: state.app.slaves,
+    usersInfo: state.app.usersInfo,
   };
 };
 
@@ -79,7 +80,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch(appSlice.actions.updateUserAccessToken(token)),
   updateSlaves: (slaves: ISlaveData[]) =>
     dispatch(appSlice.actions.updateSlaves(slaves)),
-  updateFriends: (friends: UserInfo[]) =>
+  updateFriends: (friends: number[]) =>
     dispatch(appSlice.actions.updateFriends(friends)),
     updateRating: (rating: number[]) =>
     dispatch(appSlice.actions.updateRating(rating)),
