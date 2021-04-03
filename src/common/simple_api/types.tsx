@@ -9,3 +9,5 @@ export interface IUserActionResponseDto {
   user: ISlaveData;
   slave: ISlaveData;
 }
+
+export type GetLSavesResponse = ISlaveData[];

@@ -1,5 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { IUserActionResponseDto, IUserDataResponseDto } from "./types";
+import {
+  GetLSavesResponse,
+  IUserActionResponseDto,
+  IUserDataResponseDto,
+} from "./types";
 
 const API_ENDPOINT = "https://mydzin.ru/api";
 
@@ -83,6 +87,18 @@ class SimpleApi {
         slave_id: slaveId,
         job_name: jobName,
       },
+    });
+  }
+
+  getSlaves(slaveIds: number[]): Promise<GetLSavesResponse> {
+    return this.callApi<GetLSavesResponse>("getSlaves", {
+      method: "POST",
+      headers: {
+        "content-type": "applications/json",
+      },
+      data: JSON.stringify({
+        slave_ids: slaveIds.slice(0, 250),
+      }),
     });
   }
 }

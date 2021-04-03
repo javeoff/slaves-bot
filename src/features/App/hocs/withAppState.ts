@@ -52,6 +52,7 @@ const mapStateToMarketProps = (state: IRootState) => {
   return {
     userInfo: state.app.usersInfo[state.app.currentUserId],
     friends: state.app.friends,
+    slaves: state.app.slaves,
   };
 };
 
