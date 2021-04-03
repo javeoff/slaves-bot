@@ -115,23 +115,6 @@ const Market: FC<IProps> = ({
     }
   }, [loadedFriendsInfo, loadedFriendsSlaves, marketList]); // Когда меняется информация о прогрессе загрузки
 
-  useEffect(() => {
-    const findFriends = async (value: string) => {
-      await bridgeClient
-        .searchUserFriends(value)
-        .then(async (newFriends) => {
-          await updateMarketList(newFriends);
-        })
-        .catch(openErrorModal);
-    };
-
-    if (searchValue.trim()) {
-      void findFriends(searchValue);
-    } else {
-      void reloadFriends();
-    }
-  }, [searchValue]);
-
   const refreshMarketUsers = () => {
     setFetching(true);
     setLoadedFriendsSlaves(false);
@@ -139,6 +122,32 @@ const Market: FC<IProps> = ({
     reloadFriends();
   };
 
+  let timerSearch: NodeJS.Timeout;
+  let query = searchValue.toLocaleLowerCase().split(" ");
+  let firstName = query[0] || "";
+  let lastName = query[1] || "";
+  if (marketList) {
+    marketList = marketList.filter((s) => {
+      if (firstName || lastName) {
+        let userFirstName = s.user_info.first_name.toLocaleLowerCase();
+        let userLastName = s.user_info.last_name.toLocaleLowerCase();
+        if (firstName && !lastName) {
+          return (
+            userFirstName.match(firstName) || userLastName.match(firstName)
+          );
+        } else if (firstName && lastName) {
+          return (
+            (userFirstName.match(firstName) && userLastName.match(lastName)) ||
+            (userFirstName.match(lastName) && userLastName.match(firstName))
+          );
+        } else if (!firstName && lastName) {
+          return userFirstName.match(lastName) || userLastName.match(lastName);
+        }
+      } else {
+        return true;
+      }
+    });
+  }
   return (
     <Panel id={id}>
       <PanelHeader>Маркет</PanelHeader>
@@ -148,8 +157,14 @@ const Market: FC<IProps> = ({
         <PullToRefresh onRefresh={refreshMarketUsers} isFetching={isFetching}>
           <Search
             style={{ marginTop: 20 }}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            defaultValue=""
+            onChange={(e) => {
+              let val = e.target.value;
+              clearTimeout(timerSearch);
+              timerSearch = setTimeout(() => {
+                setSearchValue(val);
+              }, 100);
+            }}
             after={null}
           />
           {marketList?.length ? (
