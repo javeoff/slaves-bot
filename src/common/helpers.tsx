@@ -21,3 +21,16 @@ export const decOfNum = (number: number, titles: string[]): string => {
       : decCases[Math.min(number % 10, 5)]
   ];
 };
+
+export const beautyNumber = (number: number): string => {
+  let str = "";
+  let numberString = String(number).split("");
+  numberString.reverse().forEach((n, i) => {
+    if ((i + 1) % 3) {
+      str += "" + n;
+    } else {
+      str += n + " ";
+    }
+  });
+  return str.split("").reverse().join("").replace(/^\s/, "");
+};

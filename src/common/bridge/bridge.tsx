@@ -46,6 +46,18 @@ class BridgeClient {
     });
   }
 
+  copyToClipboard(text: string): Promise<any> {
+    return bridge.send("VKWebAppCopyText", {
+      text: text,
+    });
+  }
+
+  opanShareDialog(link: string): Promise<any> {
+    return bridge.send("VKWebAppShare", {
+      link: link,
+    });
+  }
+
   getUserFriends(user_id: number): Promise<UserInfo[]> {
     return this.apiCall("friends.get", {
       user_id,

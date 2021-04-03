@@ -15,9 +15,9 @@ import {
   Title,
 } from "@vkontakte/vkui";
 import React, { FC } from "react";
+import { beautyNumber } from "../../common/helpers";
 import { PAGE_USER } from "../../common/routes/routes";
 import { ISlaveData } from "../../common/types/ISlaveData";
-import { MODAL_ERROR_CARD } from "../../modals/Error";
 
 interface IProps {
   user: UserInfo;
@@ -48,11 +48,12 @@ export const UserHeader: FC<IProps> = ({
         </div>
       </Div>
       <MiniInfoCell before={<Icon20StatisticCircleFillBlue />}>
-        {isMe ? "Вы зарабатываете" : "Зарабатывает"} {slave.profit_per_min} ₽ /
-        мин.
+        {isMe ? "Вы зарабатываете" : "Зарабатывает"}{" "}
+        {beautyNumber(slave.profit_per_min)} ₽ / мин.
       </MiniInfoCell>
       <MiniInfoCell before={<Icon20VotestTransferCircleFillTurquoise />}>
-        Баланс: {slave.balance} ₽ [+ {slave.slaves_profit_per_min} ₽ / мин.]
+        Баланс: {beautyNumber(slave.balance)} ₽ [+{" "}
+        {beautyNumber(slave.slaves_profit_per_min)} ₽ / мин.]
       </MiniInfoCell>
       {slave.job.name !== "" && (
         <MiniInfoCell before={<Icon20PlayCircleFillSteelGray />}>
@@ -67,6 +68,7 @@ export const UserHeader: FC<IProps> = ({
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                cursor: "pointer",
               }}
               onClick={() => {
                 router.pushPage(PAGE_USER, {
@@ -87,14 +89,14 @@ export const UserHeader: FC<IProps> = ({
               </Div>
             </div>
             {isMe && (
-              <Div style={{ paddingTop: 0 }}>
+              <Div style={{ paddingTop: 2 }}>
                 <Button
                   size="l"
                   mode="tertiary"
                   style={{ width: "100%" }}
                   onClick={() => onBuySelf()}
                 >
-                  Освободиться за {slave.price} ₽
+                  Освободиться за {beautyNumber(slave.price)} ₽
                 </Button>
               </Div>
             )}

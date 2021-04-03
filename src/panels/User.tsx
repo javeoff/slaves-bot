@@ -12,6 +12,7 @@ import {
   Group,
   Header,
   MiniInfoCell,
+  PanelHeaderBack,
   PanelHeaderClose,
   PanelSpinner,
   Title,
@@ -53,7 +54,7 @@ import {
   IUserDataResponseDto,
 } from "../common/simple_api/types";
 import { MODAL_ERROR_CARD } from "../modals/Error";
-import { getSubDate } from "../common/helpers";
+import { beautyNumber, getSubDate } from "../common/helpers";
 import { openErrorModal } from "../modals/openers";
 
 interface IProps extends IWithUserInfo {
@@ -199,7 +200,7 @@ const User: FC<IProps> = ({
     <Panel key={key} id={panelId}>
       <PanelHeader
         left={
-          <PanelHeaderClose
+          <PanelHeaderBack
             onClick={() => {
               if (location.isFirstPage()) {
                 router.replacePage(PAGE_MAIN);
@@ -255,7 +256,7 @@ const User: FC<IProps> = ({
                 mode="commerce"
                 onClick={buySlave}
               >
-                Купить за {slave.price} ₽
+                Купить за {beautyNumber(slave.price)} ₽
               </Button>
             ) : null}
             {currentUserInfo.id === slave.master_id && (
@@ -269,7 +270,7 @@ const User: FC<IProps> = ({
                 size="l"
                 onClick={sellSlave}
               >
-                Продать за {slave.sale_price} ₽
+                Продать за {beautyNumber(slave.sale_price)} ₽
               </Button>
             )}
             {currentUserInfo.id === slave.master_id &&
@@ -280,7 +281,7 @@ const User: FC<IProps> = ({
                   size="l"
                   onClick={fetterSlave}
                 >
-                  Надеть цепи за {slave.fetter_price} ₽
+                  Надеть цепи за {beautyNumber(slave.fetter_price)} ₽
                 </Button>
               )}
           </Div>

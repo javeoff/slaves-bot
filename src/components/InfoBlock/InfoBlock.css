@@ -1,11 +1,41 @@
 .info-block {
-  padding: 24px;
+  padding: 18px 22px 22px 22px;
   border-radius: 18px;
   background-color: var(--content_tint_backgroun);
   color: var(--text_primary);
+  display: flex;
 }
 
 .info-block.variant--blue {
   background-color: #3f8ae0;
   color: #fff;
+}
+
+.info-block.variant--green {
+  background-color: #4bb34b;
+  color: #fff;
+}
+
+.info-block--icon {
+  padding-right: 12px;
+}
+
+.info-block-action {
+  margin-top: 12px;
+}
+
+.info-block--body-caption {
+  margin-top: 4px;;
+}
+
+@media screen and (max-width: 380px) {
+  .info-block--icon {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .info-block {
+    padding: 8px 12px 12px 12px;
+  }
 }

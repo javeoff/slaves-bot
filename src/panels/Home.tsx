@@ -1,7 +1,7 @@
-import React, { FC } from "react";
+import React, { FC, ReactElement, useState } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
-import { Div, FixedLayout, Group, PullToRefresh } from "@vkontakte/vkui";
+import { Avatar, Button, Div, PullToRefresh, Snackbar } from "@vkontakte/vkui";
 
 import {
   IWithCurrentUserInfo,
@@ -12,11 +12,13 @@ import { SlavesList } from "../components/SlavesList/SlavesList";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { AnyFunction } from "@vkontakte/vkjs";
 import { simpleApi } from "../common/simple_api/simpleApi";
-import { Icon56UserCircleOutline } from "@vkontakte/icons";
+import { Icon16Done } from "@vkontakte/icons";
 import { PageParams, useRouter } from "@happysanta/router";
 import { MODAL_ERROR_CARD } from "../modals/Error";
 import { getSubDate } from "../common/helpers";
 import { InfoBlock } from "../components/InfoBlock/InfoBlock";
+import { Icon32LinkCircleOutline } from "@vkontakte/icons";
+import { bridgeClient } from "../common/bridge/bridge";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
@@ -46,6 +48,8 @@ const Home: FC<IProps> = ({
     });
   }
 
+  const [snack, setSnack] = useState<ReactElement | null>(null);
+
   const buySlave = () => {
     simpleApi
       .buySlave(userSlave.id)
@@ -63,6 +67,7 @@ const Home: FC<IProps> = ({
     <Panel id={id}>
       <PanelHeader>Рабы</PanelHeader>
       <PullToRefresh isFetching={isFetching} onRefresh={onRefresh}>
+        {snack}
         <UserHeader
           master={masterInfo}
           user={userInfo}
@@ -71,7 +76,43 @@ const Home: FC<IProps> = ({
           onBuySelf={buySlave}
         ></UserHeader>
         <Div>
-          <InfoBlock title="Саси писю" subtitle="Ага ага"></InfoBlock>
+          <InfoBlock
+            icon={<Icon32LinkCircleOutline fill="#fff" />}
+            title="Первые рабы"
+            subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
+            action={
+              <Button
+                mode="overlay_secondary"
+                onClick={(e) => {
+                  let link = `https://vk.com/app7809644#r${userInfo.id}`;
+                  bridgeClient.copyToClipboard(link).catch(console.error);
+                  setSnack(
+                    <Snackbar
+                      onClose={() => setSnack(null)}
+                      before={
+                        <Avatar
+                          size={24}
+                          style={{
+                            background: "var(--button_commerce_background)",
+                          }}
+                        >
+                          <Icon16Done fill="#fff" width={14} height={14} />
+                        </Avatar>
+                      }
+                      action="Поделиться"
+                      onActionClick={() => {
+                        bridgeClient.opanShareDialog(link);
+                      }}
+                    >
+                      Ссылка скопирована
+                    </Snackbar>
+                  );
+                }}
+              >
+                vk.com/app7809644#r{userInfo.id}
+              </Button>
+            }
+          ></InfoBlock>
         </Div>
         {userSlave.fetter_to >= Date.now() / 1000 && (
           <Div

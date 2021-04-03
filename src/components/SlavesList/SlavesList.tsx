@@ -19,7 +19,7 @@ import { string } from "prop-types";
 import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
 
 import "./SlavesList.css";
-import { decOfNum } from "../../common/helpers";
+import { beautyNumber, decOfNum } from "../../common/helpers";
 import { classNames } from "@vkontakte/vkjs";
 
 interface IProps {
@@ -131,7 +131,8 @@ export const SlavesList: FC<IProps> = ({
                           gray: slave.slave_object.profit_per_min <= 0,
                         })}
                       >
-                        {slave.slave_object.profit_per_min} ₽ / мин.
+                        {beautyNumber(slave.slave_object.profit_per_min)} ₽ /
+                        мин.
                       </Title>
                     </div>
                   )}
@@ -142,7 +143,7 @@ export const SlavesList: FC<IProps> = ({
                         weight="bold"
                         className="slave-list-item--profit green"
                       >
-                        {slave.slave_object.price} ₽
+                        {beautyNumber(slave.slave_object.price)} ₽
                       </Title>
                     </div>
                   )}
