@@ -224,7 +224,7 @@ const User: FC<IProps> = ({
         <div style={{ marginBottom: 128 }}>
           <SlavesList
             isMe={slave.id === currentUserInfo.id}
-            slavesCount={0}
+            slavesCount={slave.slaves_count}
             slaves={userSlaves}
           ></SlavesList>
         </div>
@@ -246,7 +246,8 @@ const User: FC<IProps> = ({
                 В цепях будет еще {getSubDate(new Date(slave.fetter_to * 1000))}
               </Div>
             )}
-            {currentUserInfo.id !== slave.master_id && (
+            {currentUserInfo.id !== slave.master_id &&
+            currentUserInfo.id !== slave.id ? (
               <Button
                 style={{ marginBottom: 8, width: "100%" }}
                 before={<Icon28MarketOutline />}
@@ -256,7 +257,7 @@ const User: FC<IProps> = ({
               >
                 Купить за {slave.price} ₽
               </Button>
-            )}
+            ) : null}
             {currentUserInfo.id === slave.master_id && (
               <Button
                 style={{

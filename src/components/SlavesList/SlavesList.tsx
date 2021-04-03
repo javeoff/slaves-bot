@@ -18,15 +18,30 @@ import { PAGE_USER, PANEL_MAIN_USER, router } from "../../common/routes/routes";
 import { string } from "prop-types";
 import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
 
+import "./SlavesList.css";
+import { decOfNum } from "../../common/helpers";
+
 interface IProps {
   slaves: ISlaveWithUserInfo[];
   slavesCount: number;
   isMe: boolean;
+  showHeader?: boolean;
+  showPosition?: boolean;
+  label?: "slaves_count" | "job_name";
+  showProfitPerMin?: boolean;
 }
 
 type CustomClick = { target: HTMLElement };
 
-export const SlavesList: FC<IProps> = ({ slaves, slavesCount, isMe }) => {
+export const SlavesList: FC<IProps> = ({
+  slaves,
+  slavesCount,
+  isMe,
+  showHeader = true,
+  showPosition = false,
+  label = "job_name",
+  showProfitPerMin = true,
+}) => {
   let router = useRouter();
   const openGiveJobModal = (slaveId: number) => {
     router.pushModal(MODAL_GIVE_JOB_CARD, {
@@ -38,14 +53,16 @@ export const SlavesList: FC<IProps> = ({ slaves, slavesCount, isMe }) => {
   };
   return (
     <Group>
-      <Header mode="primary" indicator={slavesCount}>
-        Рабы
-      </Header>
+      {showHeader && (
+        <Header mode="primary" indicator={slavesCount}>
+          Рабы
+        </Header>
+      )}
       <div style={{ marginBottom: 12 }}>
-        {slaves.map((slave) => {
+        {slaves.map((slave, i) => {
           return (
             <Div
-              key={"slave_" + slave.user_info.id}
+              key={"slave_" + slave.user_info.id + "_" + i}
               style={{ paddingBottom: 0 }}
             >
               <Card mode="shadow">
@@ -57,18 +74,38 @@ export const SlavesList: FC<IProps> = ({ slaves, slavesCount, isMe }) => {
                   }}
                   style={{ display: "flex", alignItems: "center" }}
                 >
-                  <Avatar src={slave.user_info.photo_100} size={48}></Avatar>
+                  <Avatar src={slave.user_info.photo_100} size={48}>
+                    {showPosition && (
+                      <span className="avatar-counter">{i + 1}</span>
+                    )}
+                  </Avatar>
                   <div style={{ marginLeft: 12, flex: 2 }}>
                     <Title level="3" weight="medium">
                       {slave.user_info.first_name} {slave.user_info.last_name}
                     </Title>
-                    {slave.slave_object.job.name !== "" && (
+                    {label === "job_name" ? (
+                      slave.slave_object.job.name !== "" ? (
+                        <Caption
+                          level="1"
+                          weight="regular"
+                          style={{ color: "#707070" }}
+                        >
+                          {slave.slave_object.job.name}
+                        </Caption>
+                      ) : null
+                    ) : null}
+                    {label === "slaves_count" && (
                       <Caption
                         level="1"
                         weight="regular"
                         style={{ color: "#707070" }}
                       >
-                        {slave.slave_object.job.name}
+                        {slave.slave_object.slaves_count}{" "}
+                        {decOfNum(slave.slave_object.slaves_count, [
+                          "раб",
+                          "раба",
+                          "рабов",
+                        ])}
                       </Caption>
                     )}
                     {slave.slave_object.job.name === "" && isMe ? (
@@ -84,20 +121,22 @@ export const SlavesList: FC<IProps> = ({ slaves, slavesCount, isMe }) => {
                       </Button>
                     ) : null}
                   </div>
-                  <div>
-                    <Title
-                      level="3"
-                      weight="bold"
-                      style={{
-                        color:
-                          slave.slave_object.profit_per_min > 0
-                            ? "#44CC50"
-                            : "#ddd",
-                      }}
-                    >
-                      {slave.slave_object.profit_per_min} ₽ / мин.
-                    </Title>
-                  </div>
+                  {showProfitPerMin && (
+                    <div>
+                      <Title
+                        level="3"
+                        weight="bold"
+                        style={{
+                          color:
+                            slave.slave_object.profit_per_min > 0
+                              ? "#44CC50"
+                              : "#ddd",
+                        }}
+                      >
+                        {slave.slave_object.profit_per_min} ₽ / мин.
+                      </Title>
+                    </div>
+                  )}
                   {slave.slave_object.fetter_to
                     ? Date.now() / 1000 < slave.slave_object.fetter_to && (
                         <div style={{ marginLeft: 12 }}>

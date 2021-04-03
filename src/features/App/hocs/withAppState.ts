@@ -56,6 +56,14 @@ const mapStateToMarketProps = (state: IRootState) => {
   };
 };
 
+const mapStateToRatingProps = (state: IRootState) => {
+  return {
+    rating: state.app.rating,
+    usersInfo: state.app.usersInfo,
+    slaves: state.app.slaves,
+  };
+};
+
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   updateUserInfo: (user: UserInfo) =>
     dispatch(appSlice.actions.updateUserInfo(user)),
@@ -73,6 +81,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch(appSlice.actions.updateSlaves(slaves)),
   updateFriends: (friends: UserInfo[]) =>
     dispatch(appSlice.actions.updateFriends(friends)),
+    updateRating: (rating: number[]) =>
+    dispatch(appSlice.actions.updateRating(rating)),
 });
 
 export type IWithAppState = ReturnType<typeof mapStateToProps> &
@@ -87,6 +97,9 @@ export type IWithUserInfo = ReturnType<typeof mapStateToUserProps> &
   ReturnType<typeof mapDispatchToProps>;
 
 export type IWithFriends = ReturnType<typeof mapStateToMarketProps> &
+  ReturnType<typeof mapDispatchToProps>;
+
+  export type IWithRating = ReturnType<typeof mapStateToRatingProps> &
   ReturnType<typeof mapDispatchToProps>;
 
 export const withAppState: InferableComponentEnhancer<IWithAppState> = (
@@ -104,3 +117,7 @@ export const withUserInfo: InferableComponentEnhancer<IWithUserInfo> = (
 export const withMarketState: InferableComponentEnhancer<IWithFriends> = (
   component
 ) => connect(mapStateToMarketProps, mapDispatchToProps)(component);
+
+export const withRatingState: InferableComponentEnhancer<IWithRating> = (
+  component
+) => connect(mapStateToRatingProps, mapDispatchToProps)(component);

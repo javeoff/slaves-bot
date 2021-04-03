@@ -89,7 +89,7 @@ export const UserHeader: FC<IProps> = ({
             {isMe && (
               <Div style={{ paddingTop: 0 }}>
                 <Button
-                  size="s"
+                  size="l"
                   mode="tertiary"
                   style={{ width: "100%" }}
                   onClick={() => onBuySelf()}

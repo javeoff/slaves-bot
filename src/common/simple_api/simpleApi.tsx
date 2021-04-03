@@ -101,6 +101,10 @@ class SimpleApi {
       }),
     });
   }
+
+  getTopUsers(): Promise<GetLSavesResponse> {
+    return this.callApi<GetLSavesResponse>("getTopUsers", {});
+  }
 }
 
 export const simpleApi = new SimpleApi(
