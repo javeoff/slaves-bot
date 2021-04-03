@@ -11,7 +11,13 @@ import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { openErrorModal } from "../modals/openers";
 import { ISlaveData } from "../common/types/ISlaveData";
-import { Avatar, Caption, Div } from "@vkontakte/vkui";
+import {
+  Avatar,
+  Caption,
+  Div,
+  PanelSpinner,
+  PullToRefresh,
+} from "@vkontakte/vkui";
 import { SlavesList } from "../components/SlavesList/SlavesList";
 
 interface IProps extends IWithFriends {
@@ -31,34 +37,43 @@ const Market: FC<IProps> = ({
   let [marketList, setMarketList] = useState<ISlaveWithUserInfo[]>([]);
   let [loadedFirendsInfo, setLoadedFriendsInfo] = useState<boolean>(false);
   let [loadedFirendsSlaves, setLoadedFriendsSlaves] = useState<boolean>(false);
+  let [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    async function getFriends() {
-      if (!Object.keys(friends).length) {
-        let newFriends = await bridgeClient.getUserFriends(userInfo.id);
-        console.log("got friends", newFriends);
-        updateFriends(newFriends.slice(0, 250).map((f) => f.id));
-        updateUsersInfo(newFriends);
-        setLoadedFriendsInfo(true);
-      }
+  let [isFetching, setFetching] = useState<boolean>(false);
+
+  const getFriends = async () => {
+    if (!Object.keys(friends).length) {
+      let newFriends = await bridgeClient.getUserFriends(userInfo.id);
+      console.log("got friends", newFriends);
+      updateFriends(newFriends.slice(0, 250).map((f) => f.id));
+      updateUsersInfo(newFriends);
+      setLoadedFriendsInfo(true);
     }
-    getFriends();
-  }, []);
+  };
+
+  const loadSlaves = async () => {
+    await simpleApi
+      .getSlaves(friends)
+      .then((res) => {
+        updateSlaves(res);
+        setLoadedFriendsSlaves(true);
+      })
+      .catch(openErrorModal);
+  };
+
+  const loadMarket = async () => {
+    if (!friends?.length) {
+      await getFriends();
+    }
+    await loadSlaves();
+  };
 
   useEffect(() => {
-    const loadSlaves = async () => {
-      if (friends.length) {
-        await simpleApi
-          .getSlaves(friends)
-          .then((res) => {
-            updateSlaves(res);
-            setLoadedFriendsSlaves(true);
-          })
-          .catch(openErrorModal);
-      }
-    };
-    loadSlaves();
-  }, [friends]);
+    async function initMarket() {
+      await loadMarket();
+    }
+    initMarket();
+  }, []);
 
   useEffect(() => {
     const updateMarket = async () => {
@@ -78,22 +93,45 @@ const Market: FC<IProps> = ({
     updateMarket();
   }, [loadedFirendsInfo, loadedFirendsSlaves]);
 
+  useEffect(() => {
+    if (marketList?.length) {
+      setLoading(false);
+    }
+  }, [marketList]);
+
+  const refreshRatingUsers = async () => {
+    setFetching(true);
+    setLoadedFriendsInfo(false);
+    setLoadedFriendsSlaves(false);
+    await loadMarket();
+  };
+
   return (
     <Panel id={id}>
-      <PanelHeader>Маркет</PanelHeader>
-      {marketList?.length ? (
-        <SlavesList
-          slaves={marketList}
-          slavesCount={0}
-          showHeader={false}
-          isMe={false}
-        ></SlavesList>
+      {loading ? (
+        <PanelSpinner size="large" />
       ) : (
-        <Div>
-          <Caption level="1" weight="regular" style={{ textAlign: "center" }}>
-            Список друзей пуст
-          </Caption>
-        </Div>
+        <PullToRefresh onRefresh={refreshRatingUsers} isFetching={isFetching}>
+          <PanelHeader>Маркет</PanelHeader>
+          {marketList?.length ? (
+            <SlavesList
+              slaves={marketList}
+              slavesCount={0}
+              showHeader={false}
+              isMe={false}
+            />
+          ) : (
+            <Div>
+              <Caption
+                level="1"
+                weight="regular"
+                style={{ textAlign: "center" }}
+              >
+                Список друзей пуст
+              </Caption>
+            </Div>
+          )}
+        </PullToRefresh>
       )}
     </Panel>
   );
