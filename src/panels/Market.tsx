@@ -17,6 +17,7 @@ import {
   Div,
   PanelSpinner,
   PullToRefresh,
+  Search,
 } from "@vkontakte/vkui";
 import { SlavesList } from "../components/SlavesList/SlavesList";
 
@@ -40,35 +41,40 @@ const Market: FC<IProps> = ({
   let [loading, setLoading] = useState<boolean>(true);
 
   let [isFetching, setFetching] = useState<boolean>(false);
+  const [searchValue, setSearchValue] = useState("");
+
+  const updateMarketList = async (newFriends: UserInfo[]) => {
+    newFriends = newFriends.slice(0, 250);
+    let friendsByKeys: Record<number, UserInfo> = {};
+    let friendsIds: number[] = newFriends.map((fr) => {
+      friendsByKeys[fr.id] = fr;
+      return fr.id;
+    });
+    await updateFriends(friendsIds);
+    updateUsersInfo(newFriends);
+    setLoadedFriendsInfo(true);
+    let newFriendsSlaves = await simpleApi.getSlaves(friendsIds);
+    updateSlaves(newFriendsSlaves);
+
+    let marketList: ISlaveWithUserInfo[] = newFriendsSlaves.map(
+      (friendSlave) => {
+        return {
+          user_info: friendsByKeys[friendSlave.id],
+          slave_object: friendSlave,
+        };
+      }
+    );
+    marketList = deleteOwned(marketList);
+    console.log("Set new market list", marketList);
+    setLoadedFriendsSlaves(true);
+    setMarketList(marketList);
+  };
 
   const reloadFriends = async () => {
     await bridgeClient
       .getUserFriends(userInfo.id)
       .then(async (newFriends) => {
-        newFriends = newFriends.slice(0, 250);
-        let friendsByKeys: Record<number, UserInfo> = {};
-        let friendsIds = newFriends.map((fr) => {
-          friendsByKeys[fr.id] = fr;
-          return fr.id;
-        });
-        updateFriends(friendsIds);
-        updateUsersInfo(newFriends);
-        setLoadedFriendsInfo(true);
-        let newFriendsSlaves = await simpleApi.getSlaves(friendsIds);
-        updateSlaves(newFriendsSlaves);
-        console.log(friendsByKeys);
-        let marketList: ISlaveWithUserInfo[] = newFriendsSlaves.map(
-          (friendSlave) => {
-            return {
-              user_info: friendsByKeys[friendSlave.id],
-              slave_object: friendSlave,
-            };
-          }
-        );
-        marketList = deleteOwned(marketList);
-        console.log("Set new market list", marketList);
-        setLoadedFriendsSlaves(true);
-        setMarketList(marketList);
+        await updateMarketList(newFriends);
       })
       .catch(openErrorModal);
   };
@@ -109,6 +115,23 @@ const Market: FC<IProps> = ({
     }
   }, [loadedFriendsInfo, loadedFriendsSlaves, marketList]); // Когда меняется информация о прогрессе загрузки
 
+  useEffect(() => {
+    const findFriends = async (value: string) => {
+      await bridgeClient
+        .searchUserFriends(value)
+        .then(async (newFriends) => {
+          await updateMarketList(newFriends);
+        })
+        .catch(openErrorModal);
+    };
+
+    if (searchValue.trim()) {
+      void findFriends(searchValue);
+    } else {
+      void reloadFriends();
+    }
+  }, [searchValue]);
+
   const refreshMarketUsers = () => {
     setFetching(true);
     setLoadedFriendsSlaves(false);
@@ -123,6 +146,12 @@ const Market: FC<IProps> = ({
         <PanelSpinner size="large" />
       ) : (
         <PullToRefresh onRefresh={refreshMarketUsers} isFetching={isFetching}>
+          <Search
+            style={{ marginTop: 20 }}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            after={null}
+          />
           {marketList?.length ? (
             <SlavesList
               slaves={marketList}
