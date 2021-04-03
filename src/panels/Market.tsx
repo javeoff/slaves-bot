@@ -10,6 +10,8 @@ import { bridgeClient } from "../common/bridge/bridge";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { openErrorModal } from "../modals/openers";
+import { ISlaveData } from "../common/types/ISlaveData";
+import { Avatar, Caption, Div } from "@vkontakte/vkui";
 
 interface IProps extends IWithFriends {
   id?: string;
@@ -48,20 +50,58 @@ const Market: FC<IProps> = ({
           .getSlaves(ids)
           .then((res) => {
             updateSlaves(res);
+            setLoadedFriendsSlaves(true);
           })
           .catch(openErrorModal);
       }
     };
-    if (Object.keys(friends).length) {
-      // Если мы загрузили список друзей, то ищием их объекты рабов и устанавливаем
-      loadSlaves();
-    }
+    loadSlaves();
   }, [friends]);
+
+  useEffect(() => {
+    const updateMarket = async () => {
+      const slaves_list = Object.values(slaves);
+      const users_list = Object.values(friends);
+
+      if (loadedFirendsInfo && loadedFirendsSlaves) {
+        if (!marketList?.length) {
+          const slavesInfo: ISlaveWithUserInfo[] = new Array(slaves_list.length)
+            .fill(null)
+            .map((_, idx) => ({
+              slave_object: slaves_list[idx],
+              user_info: users_list[idx],
+            }));
+
+          console.log(slavesInfo);
+
+          setMarketList(slavesInfo);
+        }
+      }
+    };
+
+    updateMarket();
+  }, [loadedFirendsInfo, loadedFirendsSlaves]);
 
   return (
     <Panel id={id}>
       <PanelHeader>Маркет</PanelHeader>
-      {JSON.stringify(friends)}
+      {marketList?.length ? (
+        marketList.map((marketItem: ISlaveWithUserInfo) => (
+          <>
+            <div>{marketItem.slave_object.id}</div>
+            <div>{marketItem.user_info?.first_name}</div>
+            <div>
+              <Avatar src={marketItem.user_info?.photo_100} />
+            </div>
+          </>
+        ))
+      ) : (
+        <Div>
+          <Caption level="1" weight="regular" style={{ textAlign: "center" }}>
+            Список друзей пуст
+          </Caption>
+        </Div>
+      )}
     </Panel>
   );
 };
