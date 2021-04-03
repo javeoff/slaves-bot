@@ -77,13 +77,17 @@ export const SlavesList: FC<IProps> = ({
                   }}
                   className="slave-list--item-container"
                 >
-                  <Avatar src={slave.user_info.photo_100} size={48}>
+                  <Avatar src={slave.user_info.photo_100} size={44}>
                     {showPosition && (
                       <span className="avatar-counter">{i + 1}</span>
                     )}
                   </Avatar>
                   <div className="slave-list--item-user-info">
-                    <Title level="3" weight="medium">
+                    <Title
+                      level="3"
+                      weight="medium"
+                      className="slave-list--item-user-info-title"
+                    >
                       {slave.user_info.first_name} {slave.user_info.last_name}
                     </Title>
                     {label === "job_name" ? (
@@ -121,39 +125,41 @@ export const SlavesList: FC<IProps> = ({
                       </Button>
                     ) : null}
                   </div>
-                  {showProfitPerMin && (
-                    <div>
-                      <Title
-                        level="3"
-                        weight="bold"
-                        className={classNames("slave-list-item--profit", {
-                          green: slave.slave_object.profit_per_min > 0,
-                          gray: slave.slave_object.profit_per_min <= 0,
-                        })}
-                      >
-                        {beautyNumber(slave.slave_object.profit_per_min)} ₽ /
-                        мин.
-                      </Title>
-                    </div>
-                  )}
-                  {showPrice && (
-                    <div>
-                      <Title
-                        level="3"
-                        weight="bold"
-                        className="slave-list-item--profit green"
-                      >
-                        {beautyNumber(slave.slave_object.price)} ₽
-                      </Title>
-                    </div>
-                  )}
-                  {slave.slave_object.fetter_to
-                    ? Date.now() / 1000 < slave.slave_object.fetter_to && (
-                        <div style={{ marginLeft: 12 }}>
-                          <Icon20LockOutline fill="#E64646" />
-                        </div>
-                      )
-                    : null}
+                  <div>
+                    {slave.slave_object.fetter_to
+                      ? Date.now() / 1000 < slave.slave_object.fetter_to && (
+                          <div className="slave-list-item--lock">
+                            <Icon20LockOutline fill="#E64646" />
+                          </div>
+                        )
+                      : null}
+                    {showProfitPerMin && (
+                      <div>
+                        <Title
+                          level="3"
+                          weight="bold"
+                          className={classNames("slave-list-item--profit", {
+                            green: slave.slave_object.profit_per_min > 0,
+                            gray: slave.slave_object.profit_per_min <= 0,
+                          })}
+                        >
+                          {beautyNumber(slave.slave_object.profit_per_min)} ₽ /
+                          мин.
+                        </Title>
+                      </div>
+                    )}
+                    {showPrice && (
+                      <div>
+                        <Title
+                          level="3"
+                          weight="bold"
+                          className="slave-list-item--profit green"
+                        >
+                          {beautyNumber(slave.slave_object.price)} ₽
+                        </Title>
+                      </div>
+                    )}
+                  </div>
                 </Div>
               </Card>
             </Div>

@@ -35,9 +35,27 @@
   opacity: 0.9;
 }
 
+.slave-list-item--lock {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 4px;
+}
+
+@media screen and (max-width: 380px) {
+  .slave-list--item-user-info-title {
+    font-size: 15px;
+  }
+
+  .slave-list-item--profit {
+    font-size: 14px;
+  }
+}
+
 .slave-list--item-container {
   display: flex;
   align-items: center;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 .slave-list--item-user-info {

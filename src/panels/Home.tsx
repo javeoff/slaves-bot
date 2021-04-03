@@ -63,6 +63,32 @@ const Home: FC<IProps> = ({
       });
   };
 
+  const copyRefLink = () => {
+    let link = `https://vk.com/app7809644#r${userInfo.id}`;
+    bridgeClient.copyToClipboard(link).catch(console.error);
+    setSnack(
+      <Snackbar
+        onClose={() => setSnack(null)}
+        before={
+          <Avatar
+            size={24}
+            style={{
+              background: "var(--button_commerce_background)",
+            }}
+          >
+            <Icon16Done fill="#fff" width={14} height={14} />
+          </Avatar>
+        }
+        action="Поделиться"
+        onActionClick={() => {
+          bridgeClient.opanShareDialog(link);
+        }}
+      >
+        Ссылка скопирована
+      </Snackbar>
+    );
+  };
+
   return (
     <Panel id={id}>
       <PanelHeader>Рабы</PanelHeader>
@@ -83,31 +109,8 @@ const Home: FC<IProps> = ({
             action={
               <Button
                 mode="overlay_secondary"
-                onClick={(e) => {
-                  let link = `https://vk.com/app7809644#r${userInfo.id}`;
-                  bridgeClient.copyToClipboard(link).catch(console.error);
-                  setSnack(
-                    <Snackbar
-                      onClose={() => setSnack(null)}
-                      before={
-                        <Avatar
-                          size={24}
-                          style={{
-                            background: "var(--button_commerce_background)",
-                          }}
-                        >
-                          <Icon16Done fill="#fff" width={14} height={14} />
-                        </Avatar>
-                      }
-                      action="Поделиться"
-                      onActionClick={() => {
-                        bridgeClient.opanShareDialog(link);
-                      }}
-                    >
-                      Ссылка скопирована
-                    </Snackbar>
-                  );
-                }}
+                onClick={copyRefLink}
+                capture={true}
               >
                 vk.com/app7809644#r{userInfo.id}
               </Button>
