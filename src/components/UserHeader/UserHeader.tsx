@@ -38,7 +38,7 @@ export const UserHeader: FC<IProps> = ({
 }) => {
   return (
     <>
-      <Div style={{ display: "flex" }}>
+      <Div style={{ userSelect: "none" }}>
         <div style={{ flex: 3 }}>
           <Avatar src={user.photo_100} size={72} />
           <div style={{ marginTop: 12 }}>
@@ -48,21 +48,23 @@ export const UserHeader: FC<IProps> = ({
           </div>
         </div>
       </Div>
-      <MiniInfoCell before={<Icon20StatisticCircleFillBlue />}>
-        {isMe ? "Вы зарабатываете" : "Зарабатывает"}{" "}
-        {beautyNumber(slave.profit_per_min)} ₽ / мин.
-      </MiniInfoCell>
-      <MiniInfoCell before={<Icon20VotestTransferCircleFillTurquoise />}>
-        Баланс: {beautyNumber(slave.balance)} ₽ [+{" "}
-        {beautyNumber(slave.slaves_profit_per_min)} ₽ / мин.]
-      </MiniInfoCell>
-      {slave.job.name !== "" && (
-        <MiniInfoCell before={<Icon20PlayCircleFillSteelGray />}>
-          Работа: {slave.job.name}
+      <div style={{ userSelect: "none" }}>
+        <MiniInfoCell before={<Icon20StatisticCircleFillBlue />}>
+          {isMe ? "Вы зарабатываете" : "Зарабатывает"}{" "}
+          {beautyNumber(slave.profit_per_min)} ₽ / мин.
         </MiniInfoCell>
-      )}
+        <MiniInfoCell before={<Icon20VotestTransferCircleFillTurquoise />}>
+          Баланс: {beautyNumber(slave.balance)} ₽ [+{" "}
+          {beautyNumber(slave.slaves_profit_per_min)} ₽ / мин.]
+        </MiniInfoCell>
+        {slave.job.name !== "" && (
+          <MiniInfoCell before={<Icon20PlayCircleFillSteelGray />}>
+            Работа: {slave.job.name}
+          </MiniInfoCell>
+        )}
+      </div>
       {master && master.id ? (
-        <Div>
+        <Div style={{ userSelect: "none" }}>
           <Card mode="outline">
             <div
               style={{

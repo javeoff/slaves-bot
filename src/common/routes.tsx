@@ -6,17 +6,27 @@ export const PAGE_PROFILE_USER_PANEL = "user_profile";
 export const PAGE_PROFILE_PANEL = "profile";
 export const PAGE_PROFILE_VIEW = "profile";
 
-export const router = new Router({
-  [PAGE_PROFILE]: {
-    activePanel: PAGE_PROFILE_PANEL,
-    activeView: PAGE_PROFILE_VIEW,
+export const getBrowserHashLocation = (): string => {
+  let loc = window.location.href.split("#")[1];
+  if (!loc) return "/";
+  if (loc[0] !== "/") loc = "/" + loc;
+  return loc;
+};
+
+export const router = new Router(
+  {
+    [PAGE_PROFILE]: {
+      activePanel: PAGE_PROFILE_PANEL,
+      activeView: PAGE_PROFILE_VIEW,
+    },
+    [PAGE_PROFILE_USER]: {
+      activePanel: PAGE_PROFILE_USER_PANEL,
+      isInfinity: true,
+      activeView: PAGE_PROFILE_VIEW,
+    },
   },
-  [PAGE_PROFILE_USER]: {
-    activePanel: PAGE_PROFILE_USER_PANEL,
-    isInfinity: true,
-    activeView: PAGE_PROFILE_VIEW,
-  },
-});
+  getBrowserHashLocation()
+);
 
 export const PAGE_MARKET = "/market";
 export const PAGE_MARKET_USER = "/market/user/:id";
