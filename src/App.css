@@ -1,0 +1,5 @@
+@media screen and (max-width: 340px) {
+  .vkuiButton--sz-l .vkuiButton__content {
+    font-size: 15px !important;
+  }
+}

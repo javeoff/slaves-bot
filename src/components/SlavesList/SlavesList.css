@@ -25,6 +25,7 @@
   cursor: pointer;
   max-height: 120px;
   user-select: none;
+  height: 78px;
 }
 
 .slaves-list--item .Card {

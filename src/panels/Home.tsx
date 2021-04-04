@@ -114,6 +114,9 @@ const Home: FC<IProps> = ({
                 vk.com/app7809644#r{userInfo.id}
               </Button>
             }
+            style={{
+              height: 100,
+            }}
           ></InfoBlock>
         </Div>
         {userSlave.fetter_to >= Date.now() / 1000 && (

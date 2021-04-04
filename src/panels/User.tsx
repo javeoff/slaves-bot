@@ -53,6 +53,8 @@ const User: FC<IProps> = ({
 
   let gotUserInfo = DefaultUserInfo;
   let gotSlave = DefaultSlave;
+  let defaultUserSlaves: ISlaveWithUserInfo[] = [];
+
   let defaultLoading = true;
   if (usersInfo[userId] && slaves[userId]) {
     gotUserInfo = usersInfo[userId];
@@ -60,11 +62,22 @@ const User: FC<IProps> = ({
     defaultLoading = false;
   }
 
+  for (let slaveId in slaves) {
+    if (slaves[slaveId].master_id === userId && usersInfo[slaveId]) {
+      defaultUserSlaves.push({
+        user_info: usersInfo[slaveId],
+        slave_object: slaves[slaveId],
+      });
+    }
+  }
+
   let [loading, setLoading] = useState<boolean>(defaultLoading);
   let [userInfo, setUserInfo] = useState<UserInfo>(gotUserInfo);
   let [masterInfo, setMasterInfo] = useState<UserInfo>(DefaultUserInfo);
   let [slave, setSlave] = useState<ISlaveData>(gotSlave);
-  let [userSlaves, setSlaves] = useState<ISlaveWithUserInfo[]>([]);
+  let [userSlaves, setSlaves] = useState<ISlaveWithUserInfo[]>(
+    defaultUserSlaves
+  );
 
   let [loadedUserInfo, setLoadedUserInfo] = useState<boolean>(false);
   let [loadedMasterInfo, setLoadedMasterInfo] = useState<boolean>(false);
@@ -186,17 +199,6 @@ const User: FC<IProps> = ({
           <PanelHeaderBack
             onClick={() => {
               router.popPage();
-              // if (location.isFirstPage()) {
-              //   console.log("is first");
-              //   router.replacePage(PAGE_MAIN);
-              // } else {
-              //   console.log(
-              //     "Is not first",
-              //     router.getCurrentLocation(),
-              //     routerType
-              //   );
-              //   router.popPage();
-              // }
             }}
           />
         }
