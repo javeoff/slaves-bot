@@ -97,12 +97,11 @@ const Home: FC<IProps> = ({
           slave={userSlave}
           isMe={true}
           onBuySelf={buySlave}
-          pageOpened={PAGE_PROFILE}
+          pageOpened={PAGE_PROFILE_USER}
           router={router}
         ></UserHeader>
         <Div>
           <InfoBlock
-            icon={<Icon32LinkCircleOutline fill="#fff" />}
             title="Первые рабы"
             subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
             action={
@@ -114,9 +113,6 @@ const Home: FC<IProps> = ({
                 vk.com/app7809644#r{userInfo.id}
               </Button>
             }
-            style={{
-              height: 100,
-            }}
           ></InfoBlock>
         </Div>
         {userSlave.fetter_to >= Date.now() / 1000 && (
@@ -127,6 +123,8 @@ const Home: FC<IProps> = ({
               opacity: 1,
               color: "red",
               textAlign: "center",
+              paddingLeft: 0,
+              paddingRight: 0,
             }}
           >
             Вы будете в цепях еще{" "}

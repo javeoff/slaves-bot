@@ -10,13 +10,13 @@ interface IProps {
   title?: string;
   subtitle?: string;
   action?: ReactElement;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
 }
 
 export const InfoBlock: FC<IProps> = ({
   icon,
   action,
-  variant = "green",
+  variant = "blue",
   title = "",
   subtitle = "",
   style,

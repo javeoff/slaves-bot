@@ -38,6 +38,7 @@ const Market: FC<IProps> = ({
   updateUsersInfo,
   updateSlaves,
 }) => {
+  let timeStart = Date.now();
   let alreadyGotMarketList: ISlaveWithUserInfo[] = [];
   if (friends.length) {
     friends.forEach((friend) => {
@@ -171,7 +172,13 @@ const Market: FC<IProps> = ({
       }
     });
   }
-  console.log("Market list", marketList.length, loading);
+  console.log(
+    "Market list",
+    marketList.length,
+    loading,
+    Date.now() - timeStart,
+    Date.now()
+  );
   return (
     <Panel id={id}>
       <PanelHeader>Маркет</PanelHeader>

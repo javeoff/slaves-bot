@@ -234,6 +234,18 @@ export class Router {
     window.history.back();
   }
 
+  popPageTo(viewId: string, panelId: string) {
+    let timesBack = 0;
+    while (true) {
+      this.popChanges();
+      if (this.getViewId() === viewId && this.getPanelId() == panelId) {
+        for (let i = 0; i < timesBack; i++) window.history.back();
+        break;
+      }
+      timesBack++;
+    }
+  }
+
   // Пушает новую панель в список
   pushPanel(
     activePanel: string,

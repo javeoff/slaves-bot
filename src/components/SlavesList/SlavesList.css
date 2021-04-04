@@ -25,7 +25,7 @@
   cursor: pointer;
   max-height: 120px;
   user-select: none;
-  height: 78px;
+  height: 72px;
 }
 
 .slaves-list--item .Card {
@@ -67,6 +67,10 @@
 
 .slave-list--item-user-info-caption {
   color: #707070;
+}
+
+body[scheme="space_gray"] .slave-list--item-user-info-caption {
+  color: #aaa;
 }
 
 .slave-list--item--button {

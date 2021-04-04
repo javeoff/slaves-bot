@@ -17,6 +17,16 @@ class BridgeClient {
   getUserInfo(): Promise<UserInfo> {
     return bridge.send("VKWebAppGetUserInfo");
   }
+  handleTheme(): this {
+    bridge.subscribe((event) => {
+      if (event.detail && event.detail.type === "VKWebAppUpdateConfig") {
+        document
+          .getElementsByTagName("body")[0]
+          ?.setAttribute("scheme", event.detail.data.scheme);
+      }
+    });
+    return this;
+  }
   getUserToken(): Promise<VKWebAppGetAuthTokenData> {
     return bridge.send("VKWebAppGetAuthToken", {
       app_id: APP_ID,
@@ -116,4 +126,4 @@ class BridgeClient {
   }
 }
 
-export const bridgeClient = new BridgeClient();
+export const bridgeClient = new BridgeClient().handleTheme();

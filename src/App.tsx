@@ -50,6 +50,7 @@ import {
 
 import { Router } from "./common/custom-router";
 import "./App.css";
+import { PANEL_MAIN, VIEW_MAIN } from "@happysanta/router";
 
 const useRouter = (router: Router) => {
   let [r, setRouterChanged] = useState<string>("");
@@ -137,7 +138,26 @@ const App: FC<IWithAppState> = ({
     void fetchData();
   }, []);
 
+  const alreadyOnTop = (): boolean => {
+    return window.pageYOffset === 0;
+  };
+
   const clickOnTabItem = (tabItem: "profile" | "market" | "rating") => {
+    if (activeStory === tabItem) {
+      // Кликнули на тот же таб.
+      if (!alreadyOnTop()) {
+        window.scrollTo(0, 0);
+        return;
+      } else {
+        // Иначе, делаем возврат на страницу
+        if (tabItem === "profile") {
+          if (router.getPanelId() !== PAGE_PROFILE_PANEL) {
+            router.popPageTo(PAGE_PROFILE_VIEW, PAGE_PROFILE_PANEL);
+          }
+        }
+      }
+    }
+
     if (tabItem === "profile") {
       marketRouter.stopNativeListeners();
       ratingRouter.stopNativeListeners();
