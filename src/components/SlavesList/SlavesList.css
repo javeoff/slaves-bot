@@ -24,8 +24,6 @@
   padding-bottom: 0px;
   cursor: pointer;
   max-height: 120px;
-  user-select: none;
-  height: 78px;
 }
 
 .slaves-list--item .Card {
@@ -70,8 +68,12 @@
 }
 
 .slave-list--item--button {
-  padding-left: 0px;
-  padding-right: 0px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.slave-list--item--button .Tappable__hoverShadow {
+  background: none!important;
 }
 
 .slave-list-item--profit.green {

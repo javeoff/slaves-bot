@@ -13,19 +13,18 @@ import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { AnyFunction } from "@vkontakte/vkjs";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { Icon16Done } from "@vkontakte/icons";
+import { PageParams, useRouter } from "@happysanta/router";
+import { MODAL_ERROR_CARD } from "../modals/Error";
 import { getSubDate } from "../common/helpers";
 import { InfoBlock } from "../components/InfoBlock/InfoBlock";
 import { Icon32LinkCircleOutline } from "@vkontakte/icons";
 import { bridgeClient } from "../common/bridge/bridge";
-import { PAGE_PROFILE, PAGE_PROFILE_USER } from "../common/routes";
-import { Router } from "../common/custom-router";
-import { openErrorModal } from "../modals/openers";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
   onRefresh: AnyFunction;
   isFetching: boolean;
-  router: Router;
+  params: PageParams;
 }
 
 const Home: FC<IProps> = ({
@@ -38,9 +37,9 @@ const Home: FC<IProps> = ({
   onRefresh,
   updateSlaves,
   isFetching,
-  router,
 }) => {
   let generatedSlavesList: ISlaveWithUserInfo[] = [];
+  let router = useRouter();
 
   for (let slaveId in userSlaves) {
     generatedSlavesList.push({
@@ -57,7 +56,11 @@ const Home: FC<IProps> = ({
       .then((res) => {
         updateSlaves([res.user, res.slave]);
       })
-      .catch(openErrorModal);
+      .catch((e) => {
+        router.pushModal(MODAL_ERROR_CARD, {
+          message: e.message,
+        });
+      });
   };
 
   const copyRefLink = () => {
@@ -97,27 +100,18 @@ const Home: FC<IProps> = ({
           slave={userSlave}
           isMe={true}
           onBuySelf={buySlave}
-          pageOpened={PAGE_PROFILE}
-          router={router}
-        ></UserHeader>
+        />
         <Div>
           <InfoBlock
             icon={<Icon32LinkCircleOutline fill="#fff" />}
             title="Первые рабы"
             subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
             action={
-              <Button
-                mode="overlay_secondary"
-                onClick={copyRefLink}
-                capture={true}
-              >
+              <Button mode="overlay_secondary" onClick={copyRefLink}>
                 vk.com/app7809644#r{userInfo.id}
               </Button>
             }
-            style={{
-              height: 100,
-            }}
-          ></InfoBlock>
+          />
         </Div>
         {userSlave.fetter_to >= Date.now() / 1000 && (
           <Div
@@ -138,9 +132,7 @@ const Home: FC<IProps> = ({
             slavesCount={userSlave.slaves_count}
             slaves={generatedSlavesList}
             isMe={true}
-            pageOpened={PAGE_PROFILE_USER}
-            router={router}
-          ></SlavesList>
+          />
         </div>
       </PullToRefresh>
     </Panel>

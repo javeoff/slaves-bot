@@ -1,3 +1,4 @@
+import { pushPage, useRouter } from "@happysanta/router";
 import {
   Icon20PlayCircleFillSteelGray,
   Icon20StatisticCircleFillBlue,
@@ -7,14 +8,15 @@ import { UserInfo } from "@vkontakte/vk-bridge";
 import {
   Avatar,
   Button,
+  Caption,
   Card,
   Div,
   MiniInfoCell,
   Title,
 } from "@vkontakte/vkui";
 import React, { FC } from "react";
-import { Router } from "../../common/custom-router";
 import { beautyNumber } from "../../common/helpers";
+import { PAGE_USER } from "../../common/routes/routes";
 import { ISlaveData } from "../../common/types/ISlaveData";
 
 interface IProps {
@@ -23,8 +25,6 @@ interface IProps {
   isMe: boolean;
   master: UserInfo;
   onBuySelf: VoidFunction;
-  router: Router;
-  pageOpened: string;
 }
 
 export const UserHeader: FC<IProps> = ({
@@ -32,10 +32,9 @@ export const UserHeader: FC<IProps> = ({
   slave,
   isMe = false,
   master,
-  router,
-  pageOpened,
   onBuySelf,
 }) => {
+  let router = useRouter();
   return (
     <>
       <Div style={{ display: "flex" }}>
@@ -72,7 +71,7 @@ export const UserHeader: FC<IProps> = ({
                 cursor: "pointer",
               }}
               onClick={() => {
-                router.pushPageRoute(pageOpened, {
+                router.pushPage(PAGE_USER, {
                   id: String(master.id),
                 });
               }}

@@ -7,17 +7,20 @@ import {
   Div,
   Group,
   Header,
+  Link,
+  RichCell,
   Title,
 } from "@vkontakte/vkui";
 import { Icon20LockOutline } from "@vkontakte/icons";
 import { ISlaveWithUserInfo } from "../../common/types/ISlaveWithUserInfo";
+import { useLocation, useRouter } from "@happysanta/router";
+import { PAGE_USER, PANEL_MAIN_USER, router } from "../../common/routes/routes";
+import { string } from "prop-types";
 import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
 
 import "./SlavesList.css";
 import { beautyNumber, decOfNum } from "../../common/helpers";
 import { classNames } from "@vkontakte/vkjs";
-import { Router } from "../../common/custom-router";
-import { getActiveRouter } from "../../common/routes";
 
 interface IProps {
   slaves: ISlaveWithUserInfo[];
@@ -28,9 +31,9 @@ interface IProps {
   label?: "slaves_count" | "job_name";
   showProfitPerMin?: boolean;
   showPrice?: boolean;
-  pageOpened: string;
-  router: Router;
 }
+
+type CustomClick = { target: HTMLElement };
 
 export const SlavesList: FC<IProps> = ({
   slaves,
@@ -41,19 +44,16 @@ export const SlavesList: FC<IProps> = ({
   label = "job_name",
   showProfitPerMin = true,
   showPrice = false,
-  pageOpened,
-  router,
 }) => {
+  let router = useRouter();
   const openGiveJobModal = (slaveId: number) => {
-    getActiveRouter().pushModal(MODAL_GIVE_JOB_CARD, {
+    router.pushModal(MODAL_GIVE_JOB_CARD, {
       id: String(slaveId),
     });
   };
-
   const openSlave = (slaveId: number) => {
-    router.pushPageRoute(pageOpened, { id: String(slaveId) });
+    router.pushPage(PAGE_USER, { id: String(slaveId) });
   };
-
   return (
     <Group>
       {showHeader && (
@@ -92,14 +92,27 @@ export const SlavesList: FC<IProps> = ({
                     </Title>
                     {label === "job_name" ? (
                       slave.slave_object.job.name !== "" ? (
-                        <Caption
-                          level="1"
-                          weight="regular"
-                          className="slave-list--item-user-info-caption"
+                        <Button
+                          mode="tertiary"
+                          className="slave-list--item--button"
+                          onClick={() =>
+                            openGiveJobModal(slave.slave_object.id)
+                          }
+                          style={{ color: "#707070" }}
                         >
                           {slave.slave_object.job.name}
-                        </Caption>
-                      ) : null
+                        </Button>
+                      ) : // <Caption
+                      //   level="1"
+                      //   weight="regular"
+                      //   className="slave-list--item-user-info-caption"
+                      //   onClick={() =>
+                      //     openGiveJobModal(slave.slave_object.id)
+                      //   }
+                      // >
+                      //   {slave.slave_object.job.name}
+                      // </Caption>
+                      null
                     ) : null}
                     {label === "slaves_count" && (
                       <Caption

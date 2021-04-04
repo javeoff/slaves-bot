@@ -2,82 +2,86 @@ import React, { FC, useEffect, useState } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
 import {
+  Avatar,
   Button,
+  Caption,
+  Card,
+  CardGrid,
   Div,
   FixedLayout,
+  Group,
+  Header,
+  MiniInfoCell,
   PanelHeaderBack,
+  PanelHeaderClose,
   PanelSpinner,
+  Title,
 } from "@vkontakte/vkui";
 import {
+  Icon16Add,
+  Icon20BugOutline,
+  Icon20CommunityName,
   Icon20FreezeOutline,
+  Icon20LockOutline,
+  Icon20MoneyCircleOutline,
+  Icon20PlayCircleFillSteelGray,
+  Icon20StatisticCircleFillBlue,
+  Icon20VotestTransferCircleFillTurquoise,
+  Icon28LockOpenOutline,
+  Icon28LockOutline,
   Icon28MarketOutline,
   Icon28MoneyCircleOutline,
+  Icon28RoubleCircleFillBlue,
 } from "@vkontakte/icons";
-
 import { UserHeader } from "../components/UserHeader/UserHeader";
+import {
+  PAGE_MAIN,
+  useLocation,
+  useParams,
+  useRouter,
+} from "@happysanta/router";
 import { SlavesList } from "../components/SlavesList/SlavesList";
 import { IWithUserInfo, withUserInfo } from "../features/App/hocs/withAppState";
 import { UserInfo } from "@vkontakte/vk-bridge";
 import { DefaultSlave, DefaultUserInfo } from "../common/defaults";
+import { number } from "prop-types";
 import { ISlaveData } from "../common/types/ISlaveData";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { bridgeClient } from "../common/bridge/bridge";
-import { IUserActionResponseDto } from "../common/simple_api/types";
+import {
+  IUserActionResponseDto,
+  IUserDataResponseDto,
+} from "../common/simple_api/types";
+import { MODAL_ERROR_CARD } from "../modals/Error";
 import { beautyNumber, getSubDate } from "../common/helpers";
 import { openErrorModal } from "../modals/openers";
-import { Router } from "../common/custom-router";
 
 interface IProps extends IWithUserInfo {
   id?: string;
   key: string;
-  pageOpened: string;
-  router: Router;
-  routerType: string;
 }
 
 const User: FC<IProps> = ({
   id: panelId,
   usersInfo,
   currentUserInfo,
-  pageOpened,
-  slaves,
   key,
-  router,
   updateSlaves,
   updateUsersInfo,
   updateUserInfo,
 }) => {
-  let params = router.getParams();
-  let userId = Number(params.id);
+  let router = useRouter();
+  let location = useLocation();
 
-  let gotUserInfo = DefaultUserInfo;
-  let gotSlave = DefaultSlave;
-  let defaultUserSlaves: ISlaveWithUserInfo[] = [];
+  let { id } = useParams();
+  let userId = Number(id);
 
-  let defaultLoading = true;
-  if (usersInfo[userId] && slaves[userId]) {
-    gotUserInfo = usersInfo[userId];
-    gotSlave = slaves[userId];
-    defaultLoading = false;
-  }
-
-  for (let slaveId in slaves) {
-    if (slaves[slaveId].master_id === userId && usersInfo[slaveId]) {
-      defaultUserSlaves.push({
-        user_info: usersInfo[slaveId],
-        slave_object: slaves[slaveId],
-      });
-    }
-  }
-
-  let [loading, setLoading] = useState<boolean>(defaultLoading);
-  let [userInfo, setUserInfo] = useState<UserInfo>(gotUserInfo);
+  let [loading, setLoading] = useState<boolean>(true);
+  let [userInfo, setUserInfo] = useState<UserInfo>(DefaultUserInfo);
   let [masterInfo, setMasterInfo] = useState<UserInfo>(DefaultUserInfo);
-  let [slave, setSlave] = useState<ISlaveData>(gotSlave);
-  let [userSlaves, setSlaves] = useState<ISlaveWithUserInfo[]>(
-    defaultUserSlaves
-  );
+  let [slave, setSlave] = useState<ISlaveData>(DefaultSlave);
+  let [userSlaves, setSlaves] = useState<ISlaveWithUserInfo[]>([]);
 
   let [loadedUserInfo, setLoadedUserInfo] = useState<boolean>(false);
   let [loadedMasterInfo, setLoadedMasterInfo] = useState<boolean>(false);
@@ -198,7 +202,11 @@ const User: FC<IProps> = ({
         left={
           <PanelHeaderBack
             onClick={() => {
-              router.popPage();
+              if (location.isFirstPage()) {
+                router.replacePage(PAGE_MAIN);
+              } else {
+                router.popPage();
+              }
             }}
           />
         }
@@ -211,8 +219,6 @@ const User: FC<IProps> = ({
           slave={slave}
           isMe={false}
           onBuySelf={buySlave}
-          router={router}
-          pageOpened={pageOpened}
         ></UserHeader>
       )}
       {!loading && (
@@ -221,8 +227,6 @@ const User: FC<IProps> = ({
             isMe={slave.id === currentUserInfo.id}
             slavesCount={slave.slaves_count}
             slaves={userSlaves}
-            router={router}
-            pageOpened={pageOpened}
           ></SlavesList>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { classNames } from "@vkontakte/vkjs";
-import { Caption, Title } from "@vkontakte/vkui";
+import { Caption, Separator, Title } from "@vkontakte/vkui";
 import React, { FC, ReactElement } from "react";
 
 import "./InfoBlock.css";
@@ -10,7 +10,6 @@ interface IProps {
   title?: string;
   subtitle?: string;
   action?: ReactElement;
-  style: React.CSSProperties;
 }
 
 export const InfoBlock: FC<IProps> = ({
@@ -19,12 +18,8 @@ export const InfoBlock: FC<IProps> = ({
   variant = "green",
   title = "",
   subtitle = "",
-  style,
 }) => (
-  <div
-    style={style}
-    className={classNames("info-block", "variant--" + variant)}
-  >
+  <div className={classNames("info-block", "variant--" + variant)}>
     {icon && <div className="info-block--icon">{icon}</div>}
     <div className="info-block--body">
       <Title level="3" weight="medium">

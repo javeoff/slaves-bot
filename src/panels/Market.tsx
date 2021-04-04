@@ -10,21 +10,19 @@ import { bridgeClient } from "../common/bridge/bridge";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { openErrorModal } from "../modals/openers";
+import { ISlaveData } from "../common/types/ISlaveData";
 import {
+  Avatar,
   Caption,
   Div,
-  FixedLayout,
   PanelSpinner,
   PullToRefresh,
   Search,
 } from "@vkontakte/vkui";
 import { SlavesList } from "../components/SlavesList/SlavesList";
-import { Router } from "../common/custom-router";
-import { PAGE_MARKET_USER } from "../common/routes";
 
 interface IProps extends IWithFriends {
   id?: string;
-  router: Router;
 }
 
 const Market: FC<IProps> = ({
@@ -33,35 +31,14 @@ const Market: FC<IProps> = ({
   userInfo,
   usersInfo,
   slaves,
-  router,
   updateFriends,
   updateUsersInfo,
   updateSlaves,
 }) => {
-  let alreadyGotMarketList: ISlaveWithUserInfo[] = [];
-  if (friends.length) {
-    friends.forEach((friend) => {
-      if (
-        slaves[friend] &&
-        usersInfo[friend] &&
-        slaves[friend].master_id !== userInfo.id
-      ) {
-        alreadyGotMarketList.push({
-          user_info: usersInfo[friend],
-          slave_object: slaves[friend],
-        });
-      }
-    });
-  }
-
-  let [marketList, setMarketList] = useState<ISlaveWithUserInfo[]>(
-    alreadyGotMarketList
-  );
+  let [marketList, setMarketList] = useState<ISlaveWithUserInfo[]>();
   let [loadedFriendsInfo, setLoadedFriendsInfo] = useState<boolean>(false);
   let [loadedFriendsSlaves, setLoadedFriendsSlaves] = useState<boolean>(false);
-  let [loading, setLoading] = useState<boolean>(
-    alreadyGotMarketList.length ? false : true
-  );
+  let [loading, setLoading] = useState<boolean>(true);
 
   let [isFetching, setFetching] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState("");
@@ -110,7 +87,7 @@ const Market: FC<IProps> = ({
 
   useEffect(() => {
     const loadMarket = async () => {
-      if (Object.keys(friends).length && !marketList.length) {
+      if (Object.keys(friends).length) {
         // Переиспользуем рейтинг
         let marketList: ISlaveWithUserInfo[] = friends.map((marketSlaveId) => {
           return {
@@ -171,57 +148,46 @@ const Market: FC<IProps> = ({
       }
     });
   }
-  console.log("Market list", marketList.length, loading);
   return (
     <Panel id={id}>
       <PanelHeader>Маркет</PanelHeader>
       {loading ? (
         <PanelSpinner size="large" />
       ) : (
-        <>
-          <FixedLayout vertical="top">
-            <Search
-              defaultValue=""
-              onChange={(e) => {
-                let val = e.target.value;
-                clearTimeout(timerSearch);
-                timerSearch = setTimeout(() => {
-                  setSearchValue(val);
-                }, 100);
-              }}
-              after={null}
+        <PullToRefresh onRefresh={refreshMarketUsers} isFetching={isFetching}>
+          <Search
+            style={{ marginTop: 20 }}
+            defaultValue=""
+            onChange={(e) => {
+              let val = e.target.value;
+              clearTimeout(timerSearch);
+              timerSearch = setTimeout(() => {
+                setSearchValue(val);
+              }, 100);
+            }}
+            after={null}
+          />
+          {marketList?.length ? (
+            <SlavesList
+              slaves={marketList}
+              slavesCount={0}
+              showHeader={false}
+              isMe={false}
+              showPrice={true}
+              showProfitPerMin={false}
             />
-          </FixedLayout>
-          <div style={{ marginTop: 60 }}>
-            <PullToRefresh
-              onRefresh={refreshMarketUsers}
-              isFetching={isFetching}
-            >
-              {marketList?.length ? (
-                <SlavesList
-                  slaves={marketList}
-                  slavesCount={0}
-                  showHeader={false}
-                  isMe={false}
-                  showPrice={true}
-                  showProfitPerMin={false}
-                  router={router}
-                  pageOpened={PAGE_MARKET_USER}
-                />
-              ) : (
-                <Div>
-                  <Caption
-                    level="1"
-                    weight="regular"
-                    style={{ textAlign: "center" }}
-                  >
-                    Список друзей пуст
-                  </Caption>
-                </Div>
-              )}
-            </PullToRefresh>
-          </div>
-        </>
+          ) : (
+            <Div>
+              <Caption
+                level="1"
+                weight="regular"
+                style={{ textAlign: "center" }}
+              >
+                Список друзей пуст
+              </Caption>
+            </Div>
+          )}
+        </PullToRefresh>
       )}
     </Panel>
   );

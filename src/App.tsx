@@ -1,21 +1,46 @@
-import React, { useState, useEffect, FC } from "react";
+import React, { useState, useEffect, ReactElement, FC } from "react";
+import bridge, { UserInfo } from "@vkontakte/vk-bridge";
 import View from "@vkontakte/vkui/dist/components/View/View";
 
 import "@vkontakte/vkui/dist/vkui.css";
 
 import {
   AdaptivityProvider,
+  Button,
+  ModalCard,
   ModalRoot,
-  Root,
+  Panel,
   Tabbar,
   TabbarItem,
 } from "@vkontakte/vkui";
-
+import {
+  getInfinityPanelId,
+  isInfinityPanel,
+  useLocation,
+  useParams,
+  useRouter,
+} from "@happysanta/router";
 import { Epic } from "@vkontakte/vkui/dist/components/Epic/Epic";
+
+import {
+  PAGE_MAIN,
+  PAGE_MARKET,
+  PAGE_RATING,
+  PANEL_MAIN,
+  PANEL_MAIN_USER,
+  PANEL_MARKET,
+  PANEL_RATING,
+  router,
+  VIEW_MAIN,
+  VIEW_MARKET,
+  VIEW_RATING,
+} from "./common/routes/routes";
+
 import {
   Icon28FavoriteOutline,
   Icon28MarketOutline,
   Icon28UserCircleOutline,
+  Icon56ErrorOutline,
 } from "@vkontakte/icons";
 
 import Home from "./panels/Home";
@@ -29,40 +54,6 @@ import { bridgeClient } from "./common/bridge/bridge";
 import { ModalError, MODAL_ERROR_CARD } from "./modals/Error";
 import { ModalGiveJob, MODAL_GIVE_JOB_CARD } from "./modals/GiveJob";
 
-import {
-  getActiveRouter,
-  marketRouter,
-  PAGE_MARKET_PANEL,
-  PAGE_MARKET_USER,
-  PAGE_MARKET_USER_PANEL,
-  PAGE_MARKET_VIEW,
-  PAGE_PROFILE_PANEL,
-  PAGE_PROFILE_USER,
-  PAGE_PROFILE_USER_PANEL,
-  PAGE_PROFILE_VIEW,
-  PAGE_RATING_PANEL,
-  PAGE_RATING_USER,
-  PAGE_RATING_USER_PANEL,
-  PAGE_RATING_VIEW,
-  ratingRouter,
-  router,
-} from "./common/routes";
-
-import { Router } from "./common/custom-router";
-import "./App.css";
-
-const useRouter = (router: Router) => {
-  let [r, setRouterChanged] = useState<string>("");
-  useEffect(() => {
-    router.onUpdateHistory(() => {
-      setRouterChanged(
-        String(Date.now()) + "_" + Math.floor(Math.random() * 1000)
-      );
-    });
-  }, []);
-  return r;
-};
-
 const App: FC<IWithAppState> = ({
   updateUserInfo,
   updateSlave,
@@ -71,21 +62,17 @@ const App: FC<IWithAppState> = ({
   updateSlaves,
   updateUsersInfo,
 }) => {
-  useRouter(router);
-  useRouter(marketRouter);
-  useRouter(ratingRouter);
+  const location = useLocation();
+  const router = useRouter();
 
   const [appLoaded, setAppLoaded] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [activeStory, setActiveStory] = useState<
-    "profile" | "market" | "loading" | "rating"
-  >("loading");
 
   const LOADING_PANEL = "loading";
 
   const reloadUserInformation = async (fetch: boolean = false) => {
     const user = await bridgeClient.getUserInfo();
-    let refId = +document.location.href.split("#")[1]?.replace("r", "");
+    let refId = +document.location.href.split("#")[1].replace("r", "");
     if (isNaN(refId)) refId = 0;
     if (fetch) setIsFetching(true);
     await simpleApi
@@ -108,7 +95,6 @@ const App: FC<IWithAppState> = ({
         updateUsersInfo(users);
         updateSlaves(u.slaves);
         setAppLoaded(true);
-        setActiveStory("profile");
         if (fetch) setIsFetching(false);
       })
       .catch((e) => {
@@ -137,161 +123,95 @@ const App: FC<IWithAppState> = ({
     void fetchData();
   }, []);
 
-  const clickOnTabItem = (tabItem: "profile" | "market" | "rating") => {
-    if (tabItem === "profile") {
-      marketRouter.stopNativeListeners();
-      ratingRouter.stopNativeListeners();
-      router.startNativeListeners();
-    } else if (tabItem == "market") {
-      router.stopNativeListeners();
-      ratingRouter.stopNativeListeners();
-      marketRouter.startNativeListeners();
-    } else if (tabItem == "rating") {
-      router.stopNativeListeners();
-      marketRouter.stopNativeListeners();
-      ratingRouter.startNativeListeners();
-    }
-    setActiveStory(tabItem);
-  };
-
-  let activeRouter = getActiveRouter();
-
   const modal = (
-    <ModalRoot activeModal={activeRouter.getModalId()}>
-      <ModalError
-        id={MODAL_ERROR_CARD}
-        onClose={() => activeRouter.popPage()}
-      ></ModalError>
-      <ModalGiveJob
-        id={MODAL_GIVE_JOB_CARD}
-        onClose={() => activeRouter.popPage()}
-      ></ModalGiveJob>
+    <ModalRoot activeModal={location.getModalId()}>
+      <ModalError onClose={() => router.popPage()} id={MODAL_ERROR_CARD} />
+      <ModalGiveJob onClose={() => router.popPage()} id={MODAL_GIVE_JOB_CARD} />
     </ModalRoot>
   );
+
+  console.log(router, location.getViewActivePanel(VIEW_MAIN));
 
   return (
     <AdaptivityProvider>
       <Epic
-        activeStory={appLoaded ? activeStory : LOADING_PANEL}
+        activeStory={appLoaded ? location.getViewId() : LOADING_PANEL}
         tabbar={
-          appLoaded ? (
+          appLoaded && (
             <Tabbar>
               <TabbarItem
                 onClick={() => {
-                  clickOnTabItem("profile");
+                  router.replacePage(PAGE_MAIN);
                 }}
-                selected={activeStory === "profile"}
+                selected={location.getPageId() === PAGE_MAIN}
                 text="Профиль"
               >
                 <Icon28UserCircleOutline />
               </TabbarItem>
               <TabbarItem
                 onClick={() => {
-                  clickOnTabItem("market");
+                  router.replacePage(PAGE_MARKET);
                 }}
-                selected={activeStory === "market"}
+                selected={location.getPageId() === PAGE_MARKET}
                 text="Маркет"
               >
                 <Icon28MarketOutline />
               </TabbarItem>
               <TabbarItem
                 onClick={() => {
-                  clickOnTabItem("rating");
+                  router.replacePage(PAGE_RATING);
                 }}
-                selected={activeStory === "rating"}
+                selected={location.getPageId() === PAGE_RATING}
                 text="Рейтинг"
               >
                 <Icon28FavoriteOutline />
               </TabbarItem>
             </Tabbar>
-          ) : null
+          )
         }
       >
-        <Root id="loading" activeView={LOADING_PANEL}>
-          <View id={LOADING_PANEL} activePanel={String(LOADING_PANEL)}>
-            <Loading id={LOADING_PANEL} />
-          </View>
-        </Root>
-        <Root id="profile" activeView="profile">
-          <View id="profile" modal={modal} activePanel={router.getPanelId()}>
-            <Home
-              id={PAGE_PROFILE_PANEL}
-              onRefresh={() => reloadUserInformation(true)}
-              isFetching={isFetching}
-              router={router}
-            />
-            {router.getInfinityPanels(PAGE_PROFILE_VIEW).map((panelId) => {
-              if (
-                router.getInfinityPanelOriginal(PAGE_PROFILE_VIEW, panelId) ===
-                PAGE_PROFILE_USER_PANEL
-              ) {
-                return (
-                  <User
-                    key={panelId}
-                    id={panelId}
-                    routerType={PAGE_PROFILE_VIEW}
-                    pageOpened={PAGE_PROFILE_USER}
-                    router={router}
-                  ></User>
-                );
+        <View
+          id={LOADING_PANEL}
+          modal={modal}
+          activePanel={String(LOADING_PANEL)}
+        >
+          <Loading id={LOADING_PANEL} />
+        </View>
+        <View
+          id={VIEW_MAIN}
+          modal={modal}
+          activePanel={String(location.getViewActivePanel(VIEW_MAIN))}
+        >
+          <Home
+            id={PANEL_MAIN}
+            onRefresh={(e) => reloadUserInformation(true)}
+            isFetching={isFetching}
+            params={useParams()}
+          />
+          {[...router.getInfinityPanelList(VIEW_MAIN)].map((panelId) => {
+            if (isInfinityPanel(panelId)) {
+              const type = getInfinityPanelId(panelId);
+              if (type === PANEL_MAIN_USER) {
+                return <User key={panelId} id={panelId}></User>;
               }
-            })}
-          </View>
-        </Root>
-        <Root id="market" activeView="market">
-          <View
-            id={PAGE_MARKET_VIEW}
-            modal={modal}
-            activePanel={marketRouter.getPanelId()}
-          >
-            <Market id={PAGE_MARKET_PANEL} router={marketRouter} />
-            {marketRouter.getInfinityPanels(PAGE_MARKET_VIEW).map((panelId) => {
-              if (
-                marketRouter.getInfinityPanelOriginal(
-                  PAGE_MARKET_VIEW,
-                  panelId
-                ) === PAGE_MARKET_USER_PANEL
-              ) {
-                return (
-                  <User
-                    key={panelId}
-                    id={panelId}
-                    routerType={PAGE_MARKET_VIEW}
-                    pageOpened={PAGE_MARKET_USER}
-                    router={marketRouter}
-                  ></User>
-                );
-              }
-            })}
-          </View>
-        </Root>
-        <Root id="rating" activeView="rating">
-          <View
-            id={PAGE_RATING_VIEW}
-            modal={modal}
-            activePanel={ratingRouter.getPanelId()}
-          >
-            <Rating id={PAGE_RATING_PANEL} router={ratingRouter} />
-            {ratingRouter.getInfinityPanels(PAGE_RATING_VIEW).map((panelId) => {
-              if (
-                ratingRouter.getInfinityPanelOriginal(
-                  PAGE_RATING_VIEW,
-                  panelId
-                ) === PAGE_RATING_USER_PANEL
-              ) {
-                return (
-                  <User
-                    key={panelId}
-                    id={panelId}
-                    routerType={PAGE_RATING_VIEW}
-                    pageOpened={PAGE_RATING_USER}
-                    router={ratingRouter}
-                  ></User>
-                );
-              }
-            })}
-          </View>
-        </Root>
+            }
+            return null;
+          })}
+        </View>
+        <View
+          id={VIEW_MARKET}
+          modal={modal}
+          activePanel={String(location.getViewActivePanel(VIEW_MARKET))}
+        >
+          <Market id={PANEL_MARKET} />
+        </View>
+        <View
+          id={VIEW_RATING}
+          modal={modal}
+          activePanel={String(location.getViewActivePanel(VIEW_RATING))}
+        >
+          <Rating id={PANEL_RATING} />
+        </View>
       </Epic>
     </AdaptivityProvider>
   );
