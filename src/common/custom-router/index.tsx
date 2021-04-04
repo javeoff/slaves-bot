@@ -128,10 +128,12 @@ export class Router {
 
   // Запускаем и иницилизируем первый роут
   init() {
+    let foundLocation = false;
     for (let routePath in this.routes) {
       let route = this.routes[routePath];
       if (this.defaultPath.match(pathToRegexp(routePath))) {
         let matched = match(routePath)(this.defaultPath);
+        foundLocation = true;
         this.pushPage(
           route.activeView,
           route.activePanel,
@@ -141,7 +143,22 @@ export class Router {
         break;
       }
     }
+    if (!foundLocation && this.routes["/"]) {
+      this.pushPage(
+        this.routes["/"].activeView,
+        this.routes["/"].activePanel,
+        {},
+        this.routes["/"].isInfinity
+      );
+    }
     this.initUpdateHistory();
+  }
+
+  isFirstPage(): boolean {
+    return (
+      this.history.viewsHistory.length === 1 &&
+      this.history.panelsHistory[this.getViewId()].length === 1
+    );
   }
 
   // Получает текущий ID для View
@@ -210,6 +227,20 @@ export class Router {
     }
   }
 
+  // Пушаем новую страницу по заданному роуту и парамтерам (как раз для открытия каких-то айтемов по ID)
+  replacePageRoute(path: string, params: Record<string, string>) {
+    if (this.routes[path]) {
+      this.replacePage(
+        this.routes[path].activeView,
+        this.routes[path].activePanel,
+        params,
+        this.routes[path].isInfinity
+      );
+    } else {
+      throw new Error("Unknow path " + path);
+    }
+  }
+
   // Пушаем новую страницу
   pushPage(
     activeView: string,
@@ -224,6 +255,27 @@ export class Router {
     }
     if (this.getPanelId() !== activePanel) {
       this.pushPanel(activePanel, params, isInfinity);
+      if (isInfinity) {
+        this.panelsCounted++;
+      }
+    }
+    this.initUpdateHistory();
+  }
+
+  replacePage(
+    activeView: string,
+    activePanel: string,
+    params: Record<string, string>,
+    isInfinity?: boolean
+  ) {
+    this.history.activeView = activeView;
+    if (this.getViewId() !== activeView) {
+      this.history.viewsHistory[
+        this.history.viewsHistory.length - 1
+      ] = activeView;
+    }
+    if (this.getPanelId() !== activePanel) {
+      this.replacePanel(activePanel, params, isInfinity);
       if (isInfinity) {
         this.panelsCounted++;
       }
@@ -277,12 +329,7 @@ export class Router {
     this.initUpdateHistory();
   }
 
-  // Пушает новую панель в список
-  pushPanel(
-    activePanel: string,
-    params: Record<string, string>,
-    infinity?: boolean
-  ) {
+  createPanels() {
     if (!this.history.panelsHistory[this.getViewId()]) {
       this.history.panelsHistory[this.getViewId()] = [];
     }
@@ -292,6 +339,15 @@ export class Router {
     if (!this.history.infinityPanelsTypes[this.getViewId()]) {
       this.history.infinityPanelsTypes[this.getViewId()] = {};
     }
+  }
+
+  // Пушает новую панель в список
+  pushPanel(
+    activePanel: string,
+    params: Record<string, string>,
+    infinity?: boolean
+  ) {
+    this.createPanels();
     let originalPanelId = activePanel;
     let infinityPaneldId = activePanel + "_" + this.panelsCounted;
     this.history.panelsHistory[this.getViewId()].push({
@@ -302,6 +358,28 @@ export class Router {
       this.history.infinityPanelsHistory[this.getViewId()].push(
         infinityPaneldId
       );
+      this.history.infinityPanelsTypes[this.getViewId()][
+        infinityPaneldId
+      ] = originalPanelId;
+    }
+  }
+
+  replacePanel(
+    activePanel: string,
+    params: Record<string, string>,
+    infinity?: boolean
+  ) {
+    this.createPanels();
+    let originalPanelId = activePanel;
+    let infinityPaneldId = activePanel + "_" + this.panelsCounted;
+    let panels = this.history.panelsHistory[this.getViewId()];
+    panels[panels.length - 1] = {
+      id: infinity ? infinityPaneldId : originalPanelId,
+      params: params,
+    };
+    if (infinity) {
+      let infinityPanels = this.history.infinityPanelsHistory[this.getViewId()];
+      infinityPanels[this.getInfinityPanels.length - 1] = infinityPaneldId;
       this.history.infinityPanelsTypes[this.getViewId()][
         infinityPaneldId
       ] = originalPanelId;

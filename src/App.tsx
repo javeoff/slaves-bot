@@ -49,6 +49,7 @@ import {
 } from "./common/routes";
 
 import { Router } from "./common/custom-router";
+import "./App.css";
 
 const useRouter = (router: Router) => {
   let [r, setRouterChanged] = useState<string>("");
@@ -149,6 +150,16 @@ const App: FC<IWithAppState> = ({
         if (tabItem === "profile") {
           if (router.getPanelId() !== PAGE_PROFILE_PANEL) {
             router.popPageTo(PAGE_PROFILE_VIEW, PAGE_PROFILE_PANEL);
+            return;
+          }
+        } else if (tabItem === "market") {
+          if (marketRouter.getPanelId() !== PAGE_MARKET_PANEL) {
+            marketRouter.popPageTo(PAGE_MARKET_VIEW, PAGE_MARKET_PANEL);
+            return;
+          }
+        } else if (tabItem === "rating") {
+          if (ratingRouter.getPanelId() !== PAGE_RATING_PANEL) {
+            ratingRouter.popPageTo(PAGE_RATING_VIEW, PAGE_RATING_PANEL);
             return;
           }
         }

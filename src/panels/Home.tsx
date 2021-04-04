@@ -97,7 +97,7 @@ const Home: FC<IProps> = ({
           slave={userSlave}
           isMe={true}
           onBuySelf={buySlave}
-          pageOpened={PAGE_PROFILE}
+          pageOpened={PAGE_PROFILE_USER}
           router={router}
         ></UserHeader>
         <Div>

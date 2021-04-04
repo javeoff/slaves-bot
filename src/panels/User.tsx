@@ -27,6 +27,7 @@ import { IUserActionResponseDto } from "../common/simple_api/types";
 import { beautyNumber, getSubDate } from "../common/helpers";
 import { openErrorModal } from "../modals/openers";
 import { Router } from "../common/custom-router";
+import { PAGE_MAIN } from "@happysanta/router";
 
 interface IProps extends IWithUserInfo {
   id?: string;
@@ -198,7 +199,12 @@ const User: FC<IProps> = ({
         left={
           <PanelHeaderBack
             onClick={() => {
-              router.popPage();
+              if (router.isFirstPage()) {
+                console.log("is first page");
+                router.replacePageRoute(PAGE_MAIN, {});
+              } else {
+                router.popPage();
+              }
             }}
           />
         }
