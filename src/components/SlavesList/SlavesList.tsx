@@ -92,13 +92,16 @@ export const SlavesList: FC<IProps> = ({
                     </Title>
                     {label === "job_name" ? (
                       slave.slave_object.job.name !== "" ? (
-                        <Caption
-                          level="1"
-                          weight="regular"
-                          className="slave-list--item-user-info-caption"
+                        <Button
+                          mode="tertiary"
+                          className="slave-list--item--button"
+                          onClick={() =>
+                            openGiveJobModal(slave.slave_object.id)
+                          }
+                          style={{ color: "#707070" }}
                         >
                           {slave.slave_object.job.name}
-                        </Caption>
+                        </Button>
                       ) : null
                     ) : null}
                     {label === "slaves_count" && (

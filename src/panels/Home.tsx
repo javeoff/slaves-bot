@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useState } from "react";
+import React, { FC, ReactElement, useEffect, useState } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
 import { Avatar, Button, Div, PullToRefresh, Snackbar } from "@vkontakte/vkui";
@@ -17,9 +17,16 @@ import { getSubDate } from "../common/helpers";
 import { InfoBlock } from "../components/InfoBlock/InfoBlock";
 import { Icon32LinkCircleOutline } from "@vkontakte/icons";
 import { bridgeClient } from "../common/bridge/bridge";
-import { PAGE_PROFILE, PAGE_PROFILE_USER } from "../common/routes";
+import {
+  getActiveRouter,
+  PAGE_PROFILE,
+  PAGE_PROFILE_PANEL,
+  PAGE_PROFILE_USER,
+} from "../common/routes";
 import { Router } from "../common/custom-router";
 import { openErrorModal } from "../modals/openers";
+import { MODAL_ERROR_CARD } from "../modals/Error";
+import { MODAL_YOUSLAVE_CARD } from "../modals/YouSlave";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
@@ -40,6 +47,20 @@ const Home: FC<IProps> = ({
   isFetching,
   router,
 }) => {
+  useEffect(() => {
+    if (masterInfo?.id) {
+      let refId = +document.location.href.split("#")[1]?.replace("r", "");
+      if (isNaN(refId)) refId = 0;
+      if (String(refId) !== localStorage.getItem("masterId")) {
+        localStorage.setItem("masterId", String(refId));
+        openYouSlaveModal(
+          `${userInfo.first_name}, теперь ты раб`,
+          `${masterInfo.first_name} ${masterInfo.last_name} взял тебя в рабство`
+        );
+      }
+    }
+  }, []);
+
   let generatedSlavesList: ISlaveWithUserInfo[] = [];
 
   for (let slaveId in userSlaves) {
@@ -50,6 +71,13 @@ const Home: FC<IProps> = ({
   }
 
   const [snack, setSnack] = useState<ReactElement | null>(null);
+
+  const openYouSlaveModal = (title: string, message: string) => {
+    getActiveRouter().pushModal(MODAL_YOUSLAVE_CARD, {
+      title,
+      message,
+    });
+  };
 
   const buySlave = () => {
     simpleApi
@@ -97,7 +125,7 @@ const Home: FC<IProps> = ({
           slave={userSlave}
           isMe={true}
           onBuySelf={buySlave}
-          pageOpened={PAGE_PROFILE}
+          pageOpened={PAGE_PROFILE_USER}
           router={router}
         ></UserHeader>
         <Div>
@@ -106,11 +134,7 @@ const Home: FC<IProps> = ({
             title="Первые рабы"
             subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
             action={
-              <Button
-                mode="overlay_secondary"
-                onClick={copyRefLink}
-                capture={true}
-              >
+              <Button mode="overlay_secondary" onClick={copyRefLink}>
                 vk.com/app7809644#r{userInfo.id}
               </Button>
             }

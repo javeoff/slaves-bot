@@ -87,3 +87,7 @@ body[scheme="space_gray"] .slave-list--item-user-info-caption {
 .slave-list-item--profit.gray {
   color: #ddd;
 }
+
+.slave-list--item--button .Tappable__hoverShadow {
+  background: none!important;
+}

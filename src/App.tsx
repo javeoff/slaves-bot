@@ -49,6 +49,7 @@ import {
 } from "./common/routes";
 
 import { Router } from "./common/custom-router";
+import { MODAL_YOUSLAVE_CARD, ModalYouSlave } from "./modals/YouSlave";
 
 const useRouter = (router: Router) => {
   let [r, setRouterChanged] = useState<string>("");
@@ -177,11 +178,15 @@ const App: FC<IWithAppState> = ({
       <ModalError
         id={MODAL_ERROR_CARD}
         onClose={() => activeRouter.popPage()}
-      ></ModalError>
+      />
       <ModalGiveJob
         id={MODAL_GIVE_JOB_CARD}
         onClose={() => activeRouter.popPage()}
-      ></ModalGiveJob>
+      />
+      <ModalYouSlave
+        id={MODAL_YOUSLAVE_CARD}
+        onClose={() => activeRouter.popPage()}
+      />
     </ModalRoot>
   );
 

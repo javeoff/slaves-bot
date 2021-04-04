@@ -18,7 +18,7 @@ import { MODAL_ERROR_CARD } from "./Error";
 
 interface IProps extends IWithCurrentUserInfo {
   onClose: VoidFunction;
-  id?: string;
+  id: string;
 }
 
 export const MODAL_GIVE_JOB_CARD = "modal_give_job_card";
