@@ -51,11 +51,19 @@ const Home: FC<IProps> = ({
     if (masterInfo?.id) {
       let refId = +document.location.href.split("#")[1]?.replace("r", "");
       if (isNaN(refId)) refId = 0;
-      if (String(refId) !== localStorage.getItem("masterId")) {
-        localStorage.setItem("masterId", String(refId));
+      if (
+        refId == userSlave.master_id &&
+        !localStorage.getItem("got_ref_info")
+      ) {
+        localStorage.setItem("got_ref_info", "true");
         openYouSlaveModal(
-          `${userInfo.first_name}, теперь ты раб`,
-          `${masterInfo.first_name} ${masterInfo.last_name} взял тебя в рабство`
+          `${userInfo.first_name}, теперь ты ${
+            userInfo.sex === 1 ? "рабыня" : "раб"
+          }`,
+          `${masterInfo.first_name} ${masterInfo.last_name} ${
+            masterInfo.sex === 1 ? "взяла" : "взял"
+          } тебя в рабство`,
+          masterInfo.photo_200
         );
       }
     }
@@ -72,10 +80,15 @@ const Home: FC<IProps> = ({
 
   const [snack, setSnack] = useState<ReactElement | null>(null);
 
-  const openYouSlaveModal = (title: string, message: string) => {
+  const openYouSlaveModal = (
+    title: string,
+    message: string,
+    photo_200: string
+  ) => {
     getActiveRouter().pushModal(MODAL_YOUSLAVE_CARD, {
       title,
       message,
+      photo_200,
     });
   };
 
@@ -151,6 +164,8 @@ const Home: FC<IProps> = ({
               opacity: 1,
               color: "red",
               textAlign: "center",
+              paddingLeft: 0,
+              paddingRight: 0,
             }}
           >
             Вы будете в цепях еще{" "}

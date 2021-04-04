@@ -95,9 +95,11 @@ export const SlavesList: FC<IProps> = ({
                         <Button
                           mode="tertiary"
                           className="slave-list--item--button"
-                          onClick={() =>
-                            openGiveJobModal(slave.slave_object.id)
-                          }
+                          onClick={() => {
+                            if (isMe) {
+                              openGiveJobModal(slave.slave_object.id);
+                            }
+                          }}
                           style={{ color: "#707070" }}
                         >
                           {slave.slave_object.job.name}

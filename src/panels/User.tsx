@@ -243,8 +243,9 @@ const User: FC<IProps> = ({
                   opacity: 1,
                   color: "red",
                   textAlign: "center",
+                  paddingLeft: 0,
+                  paddingRight: 0,
                 }}
-                onClick={sellSlave}
               >
                 В цепях будет еще {getSubDate(new Date(slave.fetter_to * 1000))}
               </Div>

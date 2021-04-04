@@ -3,7 +3,7 @@ import {
   Icon56MoneyTransferOutline,
   Icon56UserCircleOutline,
 } from "@vkontakte/icons";
-import { Button, ModalCard } from "@vkontakte/vkui";
+import { Avatar, Button, ModalCard } from "@vkontakte/vkui";
 import React, { FC } from "react";
 import { getActiveRouter } from "../common/routes";
 
@@ -22,7 +22,7 @@ export const ModalYouSlave: FC<IProps> = ({ id, onClose }) => {
     <ModalCard
       id={id}
       onClose={onClose}
-      icon={<Icon56UserCircleOutline />}
+      icon={<Avatar size={48} src={params.photo_200} />}
       header={title}
       subheader={message}
       actions={

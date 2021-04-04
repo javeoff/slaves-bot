@@ -133,6 +133,11 @@ class BridgeClient {
       return users;
     });
   }
+
+  init(): this {
+    bridge.send("VKWebAppInit");
+    return this;
+  }
 }
 
-export const bridgeClient = new BridgeClient().handleTheme();
+export const bridgeClient = new BridgeClient().handleTheme().init();
