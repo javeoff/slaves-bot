@@ -1,4 +1,4 @@
-import bridge, { UserInfo } from "@vkontakte/vk-bridge";
+import bridge, { UserInfo, ReceiveDataMap } from "@vkontakte/vk-bridge";
 
 const APP_ID = 7809644;
 type VKWebAppGetAuthTokenData = {
@@ -27,12 +27,21 @@ class BridgeClient {
     });
     return this;
   }
+
   getUserToken(): Promise<VKWebAppGetAuthTokenData> {
     return bridge.send("VKWebAppGetAuthToken", {
       app_id: APP_ID,
       scope: "friends",
     });
   }
+
+  closeApp(): Promise<any> {
+    return bridge.send("VKWebAppClose", {
+      status: "success",
+      payload: {},
+    });
+  }
+
   getApiRequestId(): string {
     return Date.now() + "_" + Math.random() * 1000;
   }

@@ -1,5 +1,5 @@
 import { classNames } from "@vkontakte/vkjs";
-import { Caption, Title } from "@vkontakte/vkui";
+import { Caption, Separator, Title } from "@vkontakte/vkui";
 import React, { FC, ReactElement } from "react";
 
 import "./InfoBlock.css";
@@ -19,12 +19,8 @@ export const InfoBlock: FC<IProps> = ({
   variant = "blue",
   title = "",
   subtitle = "",
-  style,
 }) => (
-  <div
-    style={style}
-    className={classNames("info-block", "variant--" + variant)}
-  >
+  <div className={classNames("info-block", "variant--" + variant)}>
     {icon && <div className="info-block--icon">{icon}</div>}
     <div className="info-block--body">
       <Title level="3" weight="medium">

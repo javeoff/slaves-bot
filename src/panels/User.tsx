@@ -198,7 +198,6 @@ const User: FC<IProps> = ({
         left={
           <PanelHeaderBack
             onClick={() => {
-              console.log("Pop page started", Date.now());
               router.popPage();
             }}
           />
@@ -238,8 +237,6 @@ const User: FC<IProps> = ({
                   opacity: 1,
                   color: "red",
                   textAlign: "center",
-                  paddingLeft: 0,
-                  paddingRight: 0,
                 }}
                 onClick={sellSlave}
               >

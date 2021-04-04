@@ -1,3 +1,5 @@
+import { bridgeClient } from "../bridge/bridge";
+
 const { pathToRegexp, match } = require("path-to-regexp");
 
 interface Route {
@@ -34,6 +36,7 @@ export class Router {
   panelsCounted: number;
   isActive: boolean;
   _popHandler: VoidFunction;
+  ignoreNextEvent: boolean;
 
   constructor(routes: Routes, defaultPath: string = "/") {
     this.history = {
@@ -49,8 +52,17 @@ export class Router {
     this.defaultPath = defaultPath;
     this.panelsCounted = 0;
     this.isActive = false;
-    this._popHandler = () => {
-      this.popHandler();
+    this.ignoreNextEvent = false;
+    this._popHandler = (event?: any) => {
+      if (this.isActive) {
+        if (!this.ignoreNextEvent) {
+          this.popChanges();
+        } else {
+          this.ignoreNextEvent = false;
+        }
+      } else {
+        console.log("POP inactive!", this.isActive, event);
+      }
     };
     this.init();
   }
@@ -61,7 +73,8 @@ export class Router {
   }
 
   // Запускаем прослушивание события кнопки "назад"
-  startNativeListeners() {
+  startNativeListeners(k?: any) {
+    console.log("Set is active", true, k);
     this.isActive = true;
     window.addEventListener("popstate", this._popHandler);
   }
@@ -77,12 +90,24 @@ export class Router {
           this.getPanelId()
         ];
       }
-      this.history.panelsHistory[this.getViewId()].pop(); // Удаляем из истории текущий panelId
+      if (this.history.viewsHistory.length === 1) {
+        if (this.history.panelsHistory[this.getViewId()].length === 1) {
+          bridgeClient.closeApp();
+        } else {
+          this.history.panelsHistory[this.getViewId()].pop();
+        }
+      } else {
+        this.history.panelsHistory[this.getViewId()].pop();
+      }
       if (!this.history.panelsHistory[this.getViewId()].length) {
         // Удаляем из истории текущий view
         delete this.history.infinityPanelsTypes[this.getViewId()];
         delete this.history.infinityPanelsHistory[this.getViewId()];
-        this.history.viewsHistory.pop();
+        if (this.history.viewsHistory.length > 1) {
+          this.history.viewsHistory.pop();
+        } else {
+          bridgeClient.closeApp();
+        }
         this.history.activeView = this.getViewId();
       }
     }
@@ -95,7 +120,8 @@ export class Router {
   }
 
   // Перестаем слушать кнопку "назад" у браузера. Нужно для переключения между роутерами
-  stopNativeListeners() {
+  stopNativeListeners(k?: any) {
+    console.log("Set is active", false, k);
     this.isActive = false;
     window.removeEventListener("popstate", this._popHandler);
   }
@@ -203,7 +229,6 @@ export class Router {
       }
     }
     this.initUpdateHistory();
-    window.history.pushState(null, "", "");
   }
 
   getModalId(): string | null {
@@ -236,14 +261,20 @@ export class Router {
 
   popPageTo(viewId: string, panelId: string) {
     let timesBack = 0;
+    this.stopNativeListeners("Before all true");
     while (true) {
-      this.popChanges();
+      console.log("i", this.getViewId(), this.getPanelId());
+      // console.log(this.getViewId(), this.getPanelId(), panelId);
       if (this.getViewId() === viewId && this.getPanelId() == panelId) {
-        for (let i = 0; i < timesBack; i++) window.history.back();
+        this.ignoreNextEvent = true;
+        window.history.go(-timesBack);
         break;
       }
+      this.popChanges();
       timesBack++;
     }
+    this.startNativeListeners("after all true");
+    this.initUpdateHistory();
   }
 
   // Пушает новую панель в список
