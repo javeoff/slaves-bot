@@ -1,17 +1,14 @@
-import { useParams, useRouter } from "@happysanta/router";
-import { Icon56ErrorOutline } from "@vkontakte/icons";
 import {
   Button,
   Div,
   Group,
   Input,
-  InputProps,
-  ModalCard,
   ModalPage,
   ModalPageHeader,
   PanelHeaderClose,
 } from "@vkontakte/vkui";
 import React, { FC } from "react";
+import { getActiveRouter } from "../common/routes";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import {
   IWithCurrentUserInfo,
@@ -26,9 +23,11 @@ interface IProps extends IWithCurrentUserInfo {
 
 export const MODAL_GIVE_JOB_CARD = "modal_give_job_card";
 export const ModalGiveJobPage: FC<IProps> = ({ id, onClose, updateSlaves }) => {
-  const router = useRouter();
+  let activeRouter = getActiveRouter();
   let textInput: HTMLDivElement | null;
-  let { id: slaveId } = useParams();
+  let params = activeRouter.getParams();
+  let slaveId = params.id;
+
   const giveJob = (slaveId: number, jobName: string) => {
     simpleApi
       .jobSlave(slaveId, jobName)
@@ -36,7 +35,7 @@ export const ModalGiveJobPage: FC<IProps> = ({ id, onClose, updateSlaves }) => {
         updateSlaves([res.user, res.slave]);
       })
       .catch((e) => {
-        router.pushModal(MODAL_ERROR_CARD, {
+        getActiveRouter().pushModal(MODAL_ERROR_CARD, {
           message: e.message,
         });
       });

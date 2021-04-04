@@ -1,5 +1,5 @@
 import { classNames } from "@vkontakte/vkjs";
-import { Caption, Separator, Title } from "@vkontakte/vkui";
+import { Caption, Title } from "@vkontakte/vkui";
 import React, { FC, ReactElement } from "react";
 
 import "./InfoBlock.css";

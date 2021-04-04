@@ -10,9 +10,7 @@ import { bridgeClient } from "../common/bridge/bridge";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { openErrorModal } from "../modals/openers";
-import { ISlaveData } from "../common/types/ISlaveData";
 import {
-  Avatar,
   Caption,
   Div,
   PanelSpinner,
@@ -20,9 +18,12 @@ import {
   Search,
 } from "@vkontakte/vkui";
 import { SlavesList } from "../components/SlavesList/SlavesList";
+import { Router } from "../common/custom-router";
+import { PAGE_MARKET_USER } from "../common/routes";
 
 interface IProps extends IWithFriends {
   id?: string;
+  router: Router;
 }
 
 const Market: FC<IProps> = ({
@@ -31,6 +32,7 @@ const Market: FC<IProps> = ({
   userInfo,
   usersInfo,
   slaves,
+  router,
   updateFriends,
   updateUsersInfo,
   updateSlaves,
@@ -175,6 +177,8 @@ const Market: FC<IProps> = ({
               isMe={false}
               showPrice={true}
               showProfitPerMin={false}
+              router={router}
+              pageOpened={PAGE_MARKET_USER}
             />
           ) : (
             <Div>

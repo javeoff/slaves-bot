@@ -1,8 +1,8 @@
-import { router } from "../common/routes/routes";
+import { getActiveRouter } from "../common/routes";
 import { MODAL_ERROR_CARD } from "./Error";
 
 export const openErrorModal = (e: Error) => {
-  router.pushModal(MODAL_ERROR_CARD, {
+  getActiveRouter().pushModal(MODAL_ERROR_CARD, {
     message: e.message,
   });
 };

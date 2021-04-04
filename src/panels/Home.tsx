@@ -13,18 +13,19 @@ import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { AnyFunction } from "@vkontakte/vkjs";
 import { simpleApi } from "../common/simple_api/simpleApi";
 import { Icon16Done } from "@vkontakte/icons";
-import { PageParams, useRouter } from "@happysanta/router";
-import { MODAL_ERROR_CARD } from "../modals/Error";
 import { getSubDate } from "../common/helpers";
 import { InfoBlock } from "../components/InfoBlock/InfoBlock";
 import { Icon32LinkCircleOutline } from "@vkontakte/icons";
 import { bridgeClient } from "../common/bridge/bridge";
+import { PAGE_PROFILE, PAGE_PROFILE_USER } from "../common/routes";
+import { Router } from "../common/custom-router";
+import { openErrorModal } from "../modals/openers";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
   onRefresh: AnyFunction;
   isFetching: boolean;
-  params: PageParams;
+  router: Router;
 }
 
 const Home: FC<IProps> = ({
@@ -37,9 +38,9 @@ const Home: FC<IProps> = ({
   onRefresh,
   updateSlaves,
   isFetching,
+  router,
 }) => {
   let generatedSlavesList: ISlaveWithUserInfo[] = [];
-  let router = useRouter();
 
   for (let slaveId in userSlaves) {
     generatedSlavesList.push({
@@ -56,11 +57,7 @@ const Home: FC<IProps> = ({
       .then((res) => {
         updateSlaves([res.user, res.slave]);
       })
-      .catch((e) => {
-        router.pushModal(MODAL_ERROR_CARD, {
-          message: e.message,
-        });
-      });
+      .catch(openErrorModal);
   };
 
   const copyRefLink = () => {
@@ -100,6 +97,8 @@ const Home: FC<IProps> = ({
           slave={userSlave}
           isMe={true}
           onBuySelf={buySlave}
+          pageOpened={PAGE_PROFILE}
+          router={router}
         ></UserHeader>
         <Div>
           <InfoBlock
@@ -136,6 +135,8 @@ const Home: FC<IProps> = ({
             slavesCount={userSlave.slaves_count}
             slaves={generatedSlavesList}
             isMe={true}
+            pageOpened={PAGE_PROFILE_USER}
+            router={router}
           ></SlavesList>
         </div>
       </PullToRefresh>

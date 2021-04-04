@@ -12,9 +12,12 @@ import { bridgeClient } from "../common/bridge/bridge";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { ISlaveData } from "../common/types/ISlaveData";
 import { SlavesList } from "../components/SlavesList/SlavesList";
+import { Router } from "../common/custom-router";
+import { PAGE_RATING_USER } from "../common/routes";
 
 interface IProps extends IWithRating {
   id?: string;
+  router: Router;
 }
 
 const Rating: FC<IProps> = ({
@@ -23,6 +26,7 @@ const Rating: FC<IProps> = ({
   usersInfo,
   rating,
   slaves,
+  router,
   updateRating,
   updateUsersInfo,
 }) => {
@@ -110,6 +114,8 @@ const Rating: FC<IProps> = ({
               showPosition={true}
               label="slaves_count"
               showProfitPerMin={false}
+              pageOpened={PAGE_RATING_USER}
+              router={router}
             ></SlavesList>
           )}
           {!ratingList.length && (

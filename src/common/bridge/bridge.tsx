@@ -1,4 +1,4 @@
-import bridge, { UserInfo, ReceiveDataMap } from "@vkontakte/vk-bridge";
+import bridge, { UserInfo } from "@vkontakte/vk-bridge";
 
 const APP_ID = 7809644;
 type VKWebAppGetAuthTokenData = {
