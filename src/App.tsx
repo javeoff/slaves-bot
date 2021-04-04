@@ -49,6 +49,7 @@ import {
 } from "./common/routes";
 
 import { Router } from "./common/custom-router";
+import "./App.css";
 
 const useRouter = (router: Router) => {
   let [r, setRouterChanged] = useState<string>("");

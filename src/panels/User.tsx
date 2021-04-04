@@ -41,6 +41,7 @@ const User: FC<IProps> = ({
   usersInfo,
   currentUserInfo,
   pageOpened,
+  slaves,
   key,
   router,
   updateSlaves,
@@ -50,10 +51,19 @@ const User: FC<IProps> = ({
   let params = router.getParams();
   let userId = Number(params.id);
 
-  let [loading, setLoading] = useState<boolean>(true);
-  let [userInfo, setUserInfo] = useState<UserInfo>(DefaultUserInfo);
+  let gotUserInfo = DefaultUserInfo;
+  let gotSlave = DefaultSlave;
+  let defaultLoading = true;
+  if (usersInfo[userId] && slaves[userId]) {
+    gotUserInfo = usersInfo[userId];
+    gotSlave = slaves[userId];
+    defaultLoading = false;
+  }
+
+  let [loading, setLoading] = useState<boolean>(defaultLoading);
+  let [userInfo, setUserInfo] = useState<UserInfo>(gotUserInfo);
   let [masterInfo, setMasterInfo] = useState<UserInfo>(DefaultUserInfo);
-  let [slave, setSlave] = useState<ISlaveData>(DefaultSlave);
+  let [slave, setSlave] = useState<ISlaveData>(gotSlave);
   let [userSlaves, setSlaves] = useState<ISlaveWithUserInfo[]>([]);
 
   let [loadedUserInfo, setLoadedUserInfo] = useState<boolean>(false);

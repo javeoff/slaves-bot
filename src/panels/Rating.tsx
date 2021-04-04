@@ -30,11 +30,30 @@ const Rating: FC<IProps> = ({
   updateRating,
   updateUsersInfo,
 }) => {
-  let [loading, setLoading] = useState<boolean>(true);
+  let defaultLoading = true;
+  let defaultRatingList: ISlaveWithUserInfo[] = [];
 
+  if (rating.length) {
+    rating.forEach((userId) => {
+      if (slaves[userId] && usersInfo[userId]) {
+        defaultRatingList.push({
+          user_info: usersInfo[userId],
+          slave_object: slaves[userId],
+        });
+      }
+    });
+  }
+
+  if (defaultRatingList.length) {
+    defaultLoading = false;
+  }
+
+  let [loading, setLoading] = useState<boolean>(defaultLoading);
   let [loadedTopUsers, setLoadedTopUsers] = useState<boolean>(false);
   let [loadedTopUsersInfo, setLoadedTopUsersInfo] = useState<boolean>(false);
-  let [ratingList, setRatingList] = useState<ISlaveWithUserInfo[]>([]);
+  let [ratingList, setRatingList] = useState<ISlaveWithUserInfo[]>(
+    defaultRatingList
+  );
   let [isFetching, setFetching] = useState<boolean>(false);
 
   const reloadRating = async () => {
