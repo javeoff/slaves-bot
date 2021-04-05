@@ -121,9 +121,7 @@ const Home: FC<IProps> = ({
     );
   };
 
-  const infoBlockStyles: React.CSSProperties = {
-    height: 100,
-  };
+  const slaveListStyles = { marginBottom: 56 };
 
   console.log("Complete render user page", Date.now());
   return (
@@ -151,7 +149,6 @@ const Home: FC<IProps> = ({
                 vk.com/app7809644#r{userInfo.id}
               </Button>
             }
-            style={infoBlockStyles}
           ></InfoBlock>
         </Div>
         {userSlave.fetter_to >= Date.now() / 1000 && (
@@ -160,7 +157,7 @@ const Home: FC<IProps> = ({
             {getSubDate(new Date(userSlave.fetter_to * 1000))}
           </Div>
         )}
-        <div style={{ marginBottom: 56 }}>
+        <div style={slaveListStyles}>
           <SlavesList
             slavesCount={userSlave.slaves_count}
             slaves={generatedSlavesList}
