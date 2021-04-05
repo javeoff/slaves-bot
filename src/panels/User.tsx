@@ -49,9 +49,10 @@ const User: FC<IProps> = ({
   updateUsersInfo,
   updateUserInfo,
 }) => {
-  console.log("Render user profile page", Date.now());
   let params = router.getParams();
   let userId = Number(params.id);
+
+  console.log("Render user profile page", Date.now(), params, slaves[userId]);
 
   let gotUserInfo = DefaultUserInfo;
   let gotSlave = DefaultSlave;
@@ -81,9 +82,17 @@ const User: FC<IProps> = ({
     defaultUserSlaves
   );
 
+  console.log("Slave", slave, gotSlave);
+
   let [loadedUserInfo, setLoadedUserInfo] = useState<boolean>(false);
   let [loadedMasterInfo, setLoadedMasterInfo] = useState<boolean>(false);
   let [loadedUserData, setLoadedUserData] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (slaves[userId]) {
+      setSlave(slaves[userId]);
+    }
+  }, [gotSlave]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -220,6 +229,7 @@ const User: FC<IProps> = ({
           onBuySelf={buySlave}
           router={router}
           pageOpened={pageOpened}
+          currentUserId={currentUserInfo.id}
         ></UserHeader>
       )}
       {!loading && (

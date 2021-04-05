@@ -2,6 +2,7 @@ import {
   Icon20PlayCircleFillSteelGray,
   Icon20StatisticCircleFillBlue,
   Icon20VotestTransferCircleFillTurquoise,
+  Icon24WriteOutline,
 } from "@vkontakte/icons";
 import { UserInfo } from "@vkontakte/vk-bridge";
 import {
@@ -12,10 +13,12 @@ import {
   MiniInfoCell,
   Title,
 } from "@vkontakte/vkui";
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import { Router } from "../../common/custom-router";
 import { beautyNumber } from "../../common/helpers";
 import { ISlaveData } from "../../common/types/ISlaveData";
+import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
+import { InfoBlock } from "../InfoBlock/InfoBlock";
 
 interface IProps {
   user: UserInfo;
@@ -25,6 +28,7 @@ interface IProps {
   onBuySelf: VoidFunction;
   router: Router;
   pageOpened: string;
+  currentUserId: number;
 }
 
 export const UserHeader: FC<IProps> = ({
@@ -34,8 +38,29 @@ export const UserHeader: FC<IProps> = ({
   master,
   router,
   pageOpened,
+  currentUserId,
   onBuySelf,
 }) => {
+  console.log("Updated user header", slave);
+  const isMine = slave.master_id == currentUserId;
+  const giveJobInfoStyles = { paddingBottom: 0 };
+  const titleStyles = { marginTop: 12 };
+  const masterAvatarStyles = { paddingRight: 0 };
+  const freeButtonStyles = { paddingTop: 2 };
+  const masterTakenStyles = { fontSize: 14 };
+  const buySelfCallback = useCallback(() => {
+    onBuySelf();
+  }, []);
+  const openMaster = useCallback(() => {
+    router.pushPageRoute(pageOpened, {
+      id: String(master.id),
+    });
+  }, [master]);
+  const openGiveJobModal = useCallback(() => {
+    router.pushModal(MODAL_GIVE_JOB_CARD, {
+      id: String(slave.id),
+    });
+  }, [slave]);
   return (
     <>
       <Div style={{ userSelect: "none" }}>
@@ -43,10 +68,10 @@ export const UserHeader: FC<IProps> = ({
           <a href={`https://vk.com/id${user.id}`} target="_blank">
             <Avatar src={user.photo_100} size={72} />
           </a>
-          <div style={{ marginTop: 12 }}>
+          <div style={titleStyles}>
             <Title level="2" weight="medium">
               {user.first_name} {user.last_name}
-            </Title>
+            </Title>{" "}
           </div>
         </div>
       </Div>
@@ -64,6 +89,22 @@ export const UserHeader: FC<IProps> = ({
             Работа: {slave.job.name}
           </MiniInfoCell>
         )}
+        {slave.job.name == "" && isMine ? (
+          <Div style={giveJobInfoStyles}>
+            <InfoBlock
+              title="Ваш раб без работы"
+              variant="gray"
+              clickable={true}
+              subtitle="Рабы без работы не приносят доход"
+              after={
+                <Button mode="overlay_primary">
+                  <Icon24WriteOutline />
+                </Button>
+              }
+              onClick={openGiveJobModal}
+            />
+          </Div>
+        ) : null}
       </div>
       {master && master.id ? (
         <Div style={{ userSelect: "none" }}>
@@ -75,31 +116,27 @@ export const UserHeader: FC<IProps> = ({
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={() => {
-                router.pushPageRoute(pageOpened, {
-                  id: String(master.id),
-                });
-              }}
+              onClick={openMaster}
             >
-              <Div style={{ paddingRight: 0 }}>
+              <Div style={masterAvatarStyles}>
                 <Avatar src={master.photo_100} size={56} />
               </Div>
               <Div>
                 <Title level="3" weight="medium">
                   {master.first_name} {master.last_name}
                 </Title>
-                <span style={{ fontSize: 14 }}>
+                <span style={masterTakenStyles}>
                   {isMe ? "Держит вас в рабстве" : "Владеет этим рабом"}
                 </span>
               </Div>
             </div>
             {isMe && (
-              <Div style={{ paddingTop: 2 }}>
+              <Div style={freeButtonStyles}>
                 <Button
                   size="l"
                   mode="tertiary"
                   style={{ width: "100%" }}
-                  onClick={() => onBuySelf()}
+                  onClick={buySelfCallback}
                 >
                   Освободиться за {beautyNumber(slave.price)} ₽
                 </Button>

@@ -6,11 +6,14 @@ import "./InfoBlock.css";
 
 interface IProps {
   icon?: ReactElement;
-  variant?: "blue" | "green";
+  variant?: "blue" | "green" | "orange" | "gray";
   title?: string;
   subtitle?: string;
   action?: ReactElement;
   style?: React.CSSProperties;
+  after?: ReactElement;
+  clickable?: boolean;
+  onClick?: VoidFunction;
 }
 
 export const InfoBlock: FC<IProps> = ({
@@ -19,8 +22,18 @@ export const InfoBlock: FC<IProps> = ({
   variant = "blue",
   title = "",
   subtitle = "",
+  style,
+  after,
+  clickable = false,
+  onClick,
 }) => (
-  <div className={classNames("info-block", "variant--" + variant)}>
+  <div
+    className={classNames("info-block", "variant--" + variant, {
+      "info-block--clickable": clickable,
+    })}
+    style={style}
+    onClick={onClick}
+  >
     {icon && <div className="info-block--icon">{icon}</div>}
     <div className="info-block--body">
       <Title level="3" weight="medium">
@@ -31,5 +44,6 @@ export const InfoBlock: FC<IProps> = ({
       </Caption>
       {action && <div className="info-block-action">{action}</div>}
     </div>
+    {after && <div className="info-block--after">{after}</div>}
   </div>
 );

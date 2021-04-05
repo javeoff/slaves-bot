@@ -17,15 +17,9 @@ import { getSubDate } from "../common/helpers";
 import { InfoBlock } from "../components/InfoBlock/InfoBlock";
 import { Icon32LinkCircleOutline } from "@vkontakte/icons";
 import { bridgeClient } from "../common/bridge/bridge";
-import {
-  getActiveRouter,
-  PAGE_PROFILE,
-  PAGE_PROFILE_PANEL,
-  PAGE_PROFILE_USER,
-} from "../common/routes";
+import { getActiveRouter, PAGE_PROFILE_USER } from "../common/routes";
 import { Router } from "../common/custom-router";
 import { openErrorModal } from "../modals/openers";
-import { MODAL_ERROR_CARD } from "../modals/Error";
 import { MODAL_YOUSLAVE_CARD } from "../modals/YouSlave";
 
 interface IProps extends IWithCurrentUserInfo {
@@ -145,6 +139,7 @@ const Home: FC<IProps> = ({
           onBuySelf={buySlave}
           pageOpened={PAGE_PROFILE_USER}
           router={router}
+          currentUserId={userInfo.id}
         ></UserHeader>
         <Div>
           <InfoBlock

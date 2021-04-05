@@ -12,9 +12,26 @@
   color: #fff;
 }
 
+.info-block.info-block--clickable {
+  cursor: pointer;
+}
+
+.info-block.info-block--clickable:hover {
+  opacity: 0.8;
+}
+
 .info-block.variant--green {
   background-color: #4bb34b;
   color: #fff;
+}
+
+.info-block.variant--orange {
+  background-color: #FE9F00;
+  color: #fff;
+}
+
+.info-block.variant--gray {
+  background-color: var(--content_tint_background);
 }
 
 .info-block--icon {
@@ -27,6 +44,14 @@
 
 .info-block--body-caption {
   margin-top: 4px;;
+}
+
+.info-block--after {
+  margin-left: 22px;
+  flex: 4;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 @media screen and (max-width: 380px) {
