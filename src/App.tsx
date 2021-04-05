@@ -51,6 +51,7 @@ import {
 import { Router } from "./common/custom-router";
 import { MODAL_YOUSLAVE_CARD, ModalYouSlave } from "./modals/YouSlave";
 import "./App.css";
+import { openErrorModal } from "./modals/openers";
 
 const useRouter = (router: Router) => {
   let [r, setRouterChanged] = useState<string>("");
@@ -115,6 +116,7 @@ const App: FC<IWithAppState> = ({
       })
       .catch((e) => {
         console.error(e);
+        openErrorModal(e);
         if (fetch) setIsFetching(false);
       });
   };
@@ -243,7 +245,11 @@ const App: FC<IWithAppState> = ({
         }
       >
         <Root id="loading" activeView={LOADING_PANEL}>
-          <View id={LOADING_PANEL} activePanel={String(LOADING_PANEL)}>
+          <View
+            id={LOADING_PANEL}
+            modal={modal}
+            activePanel={String(LOADING_PANEL)}
+          >
             <Loading id={LOADING_PANEL} />
           </View>
         </Root>
