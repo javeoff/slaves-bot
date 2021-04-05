@@ -5,7 +5,7 @@ import {
   IUserDataResponseDto,
 } from "./types";
 
-const API_ENDPOINT = "https://mydzin.ru/api";
+const API_ENDPOINT = "https://peostore.mydzin.ru/api";
 
 class SimpleApi {
   endPoint: string;
