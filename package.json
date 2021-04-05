@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
+    "start_http": "cross-env PORT=10888 react-scripts start",
     "build": "react-scripts build",
     "predeploy": "npm run build",
     "deploy": "vk-miniapps-deploy"
