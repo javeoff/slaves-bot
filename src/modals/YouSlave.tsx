@@ -1,8 +1,3 @@
-import {
-  Icon56ErrorOutline,
-  Icon56MoneyTransferOutline,
-  Icon56UserCircleOutline,
-} from "@vkontakte/icons";
 import { Avatar, Button, ModalCard } from "@vkontakte/vkui";
 import React, { FC } from "react";
 import { getActiveRouter } from "../common/routes";

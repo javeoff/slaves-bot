@@ -1,6 +1,5 @@
 import { UserInfo } from "@vkontakte/vk-bridge";
 import { ISlaveData } from "./types/ISlaveData";
-import { ISlaveWithUserInfo } from "./types/ISlaveWithUserInfo";
 
 export const DefaultUserInfo: UserInfo = {
   id: 0,
