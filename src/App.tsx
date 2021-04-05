@@ -85,6 +85,7 @@ const App: FC<IWithAppState> = ({
   const LOADING_PANEL = "loading";
 
   const reloadUserInformation = async (fetch: boolean = false) => {
+    console.log("Reload user info");
     const user = await bridgeClient.getUserInfo();
     let refId = +document.location.href.split("#")[1]?.replace("r", "");
     if (isNaN(refId)) refId = 0;
@@ -120,6 +121,7 @@ const App: FC<IWithAppState> = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("Fetching data user");
       let userToken = "";
       while (true) {
         // Получаем токен, пока не получим
@@ -201,6 +203,7 @@ const App: FC<IWithAppState> = ({
     </ModalRoot>
   );
 
+  console.log("Render app", Date.now());
   return (
     <AdaptivityProvider>
       <Epic

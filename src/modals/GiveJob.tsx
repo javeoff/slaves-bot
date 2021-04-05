@@ -1,6 +1,7 @@
 import {
   Button,
   Div,
+  FormLayout,
   Group,
   Input,
   ModalPage,
@@ -41,6 +42,14 @@ export const ModalGiveJobPage: FC<IProps> = ({ id, onClose, updateSlaves }) => {
       });
   };
 
+  const acceptGiveJob = () => {
+    if (textInput) {
+      let val: string = String(textInput.querySelector("input")?.value);
+      giveJob(+slaveId, val);
+    }
+    onClose();
+  };
+
   return (
     <ModalPage
       id={id}
@@ -53,29 +62,23 @@ export const ModalGiveJobPage: FC<IProps> = ({ id, onClose, updateSlaves }) => {
     >
       <Group>
         <Div>
-          <Input
-            style={{ width: "100%", marginBottom: 12 }}
-            placeholder="Учитель"
-            getRootRef={(ref) => {
-              textInput = ref;
-            }}
-          />
-          <Button
-            style={{ width: "100%" }}
-            size="l"
-            mode="primary"
-            onClick={() => {
-              if (textInput) {
-                let val: string = String(
-                  textInput.querySelector("input")?.value
-                );
-                giveJob(+slaveId, val);
-              }
-              onClose();
+          <FormLayout
+            onSubmit={(e) => {
+              e.preventDefault();
+              acceptGiveJob();
             }}
           >
-            Дать работу
-          </Button>
+            <Input
+              style={{ width: "100%", marginBottom: 12 }}
+              placeholder="Учитель"
+              getRootRef={(ref) => {
+                textInput = ref;
+              }}
+            />
+            <Button style={{ width: "100%" }} size="l" mode="primary">
+              Дать работу
+            </Button>
+          </FormLayout>
         </Div>
       </Group>
     </ModalPage>

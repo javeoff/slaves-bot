@@ -34,3 +34,11 @@ export const beautyNumber = (number: number): string => {
   });
   return str.split("").reverse().join("").replace(/^\s/, "");
 };
+
+export const toFixedSize = (
+  str: string,
+  size: number,
+  showDots: boolean = false
+): string => {
+  return str.slice(0, size) + (str.length > size && showDots ? "..." : "");
+};

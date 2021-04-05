@@ -49,6 +49,7 @@ const User: FC<IProps> = ({
   updateUsersInfo,
   updateUserInfo,
 }) => {
+  console.log("Render user profile page", Date.now());
   let params = router.getParams();
   let userId = Number(params.id);
 
@@ -236,17 +237,7 @@ const User: FC<IProps> = ({
         <FixedLayout vertical="bottom">
           <Div style={{ paddingBottom: 0 }}>
             {slave.fetter_to >= Date.now() / 1000 && (
-              <Div
-                style={{
-                  marginBottom: 8,
-                  width: "100%",
-                  opacity: 1,
-                  color: "red",
-                  textAlign: "center",
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                }}
-              >
+              <Div className="fettered-message">
                 В цепях будет еще {getSubDate(new Date(slave.fetter_to * 1000))}
               </Div>
             )}

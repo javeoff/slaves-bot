@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import {
   Avatar,
   Button,
@@ -14,10 +14,12 @@ import { ISlaveWithUserInfo } from "../../common/types/ISlaveWithUserInfo";
 import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
 
 import "./SlavesList.css";
-import { beautyNumber, decOfNum } from "../../common/helpers";
+import { beautyNumber, decOfNum, toFixedSize } from "../../common/helpers";
 import { classNames } from "@vkontakte/vkjs";
 import { Router } from "../../common/custom-router";
 import { getActiveRouter } from "../../common/routes";
+import { MOBILE_SIZE } from "@vkontakte/vkui/dist/components/AdaptivityProvider/AdaptivityProvider";
+import { ISlaveData } from "../../common/types/ISlaveData";
 
 interface IProps {
   slaves: ISlaveWithUserInfo[];
@@ -54,6 +56,28 @@ export const SlavesList: FC<IProps> = ({
     router.pushPageRoute(pageOpened, { id: String(slaveId) });
   };
 
+  const isPhone = window.innerWidth <= MOBILE_SIZE + 20;
+  const avatarSize = isPhone ? 36 : 44;
+
+  const onClickHandler = useCallback((a: any) => {
+    if (!a.target.classList.contains("Button__content")) {
+      let el: HTMLDivElement = a.currentTarget;
+      let slaveId = 0;
+      if (el.dataset.slaveId) slaveId = +el.dataset.slaveId;
+      openSlave(slaveId);
+    }
+  }, []);
+
+  const onGiveJobHandler = useCallback((a: any) => {
+    let el: HTMLDivElement = a.currentTarget;
+    let slaveId = 0;
+    if (el.dataset.slaveId) slaveId = +el.dataset.slaveId;
+    if (isMe) {
+      openGiveJobModal(slaveId);
+    }
+  }, []);
+
+  const listStyles: React.CSSProperties = { marginBottom: 12 };
   return (
     <Group>
       {showHeader && (
@@ -61,7 +85,7 @@ export const SlavesList: FC<IProps> = ({
           {isMe ? "Мои рабы" : "Рабов"}
         </Header>
       )}
-      <div style={{ marginBottom: 12 }}>
+      <div style={listStyles}>
         {slaves.map((slave, i) => {
           return (
             <Div
@@ -70,14 +94,11 @@ export const SlavesList: FC<IProps> = ({
             >
               <Card mode="shadow">
                 <Div
-                  onClick={(a: any) => {
-                    if (!a.target.classList.contains("Button__content")) {
-                      openSlave(slave.slave_object.id);
-                    }
-                  }}
+                  onClick={onClickHandler}
+                  data-slave-id={slave.user_info.id}
                   className="slave-list--item-container"
                 >
-                  <Avatar src={slave.user_info.photo_100} size={44}>
+                  <Avatar src={slave.user_info.photo_100} size={avatarSize}>
                     {showPosition && (
                       <span className="avatar-counter">{i + 1}</span>
                     )}
@@ -88,19 +109,16 @@ export const SlavesList: FC<IProps> = ({
                       weight="medium"
                       className="slave-list--item-user-info-title"
                     >
-                      {slave.user_info.first_name} {slave.user_info.last_name}
+                      {toFixedSize(slave.user_info.first_name, 18)}{" "}
+                      {toFixedSize(slave.user_info.last_name, 12, true)}
                     </Title>
                     {label === "job_name" ? (
                       slave.slave_object.job.name !== "" ? (
                         <Button
                           mode="tertiary"
-                          className="slave-list--item--button"
-                          onClick={() => {
-                            if (isMe) {
-                              openGiveJobModal(slave.slave_object.id);
-                            }
-                          }}
-                          style={{ color: "#707070" }}
+                          className="slave-list--item--button inactive"
+                          data-slave-id={slave.user_info.id}
+                          onClick={onGiveJobHandler}
                         >
                           {slave.slave_object.job.name}
                         </Button>
@@ -124,7 +142,8 @@ export const SlavesList: FC<IProps> = ({
                       <Button
                         mode="tertiary"
                         className="slave-list--item--button"
-                        onClick={() => openGiveJobModal(slave.slave_object.id)}
+                        data-slave-id={slave.user_info.id}
+                        onClick={onGiveJobHandler}
                       >
                         Дать работу
                       </Button>

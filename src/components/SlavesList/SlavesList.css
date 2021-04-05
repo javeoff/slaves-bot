@@ -42,6 +42,10 @@
   padding-bottom: 4px;
 }
 
+.slave-list--item-user-info-title {
+  display: block;
+}
+
 @media screen and (max-width: 380px) {
   .slave-list--item-user-info-title {
     font-size: 15px;
@@ -49,6 +53,26 @@
 
   .slave-list-item--profit {
     font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  .slave-list--item-user-info-title {
+    font-size: 14px;
+  }
+
+  .slave-list-item--profit {
+    font-size: 12px;
+  }
+
+  .slaves-list--item  .Button__content {
+    font-size: 13px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  .slaves-list--item .Button {
+    min-height: 0px;
   }
 }
 
@@ -62,6 +86,7 @@
 .slave-list--item-user-info {
   margin-left: 12px;
   flex: 2;
+  overflow: hidden;
 }
 
 .slave-list--item-user-info-caption {
@@ -75,6 +100,17 @@ body[scheme="space_gray"] .slave-list--item-user-info-caption {
 .slave-list--item--button {
   padding-left: 0;
   padding-right: 0;
+}
+
+.slave-list--item--button.inactive .Button__content {
+  color: #707070;
+  font-weight: 400;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.slave-list--item--button.inactive {
+  min-height: 22px;
 }
 
 .slave-list--item--button .Tappable__hoverShadow {

@@ -1,3 +1,13 @@
 .vkuiTabbarItem {
   cursor: pointer;
 }
+
+.fettered-message {
+  margin-bottom: 8px;
+  width: 100%;
+  opacity: 1;
+  color: red;
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+}

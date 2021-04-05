@@ -127,6 +127,11 @@ const Home: FC<IProps> = ({
     );
   };
 
+  const infoBlockStyles: React.CSSProperties = {
+    height: 100,
+  };
+
+  console.log("Complete render user page", Date.now());
   return (
     <Panel id={id}>
       <PanelHeader>Рабы</PanelHeader>
@@ -151,23 +156,11 @@ const Home: FC<IProps> = ({
                 vk.com/app7809644#r{userInfo.id}
               </Button>
             }
-            style={{
-              height: 100,
-            }}
+            style={infoBlockStyles}
           ></InfoBlock>
         </Div>
         {userSlave.fetter_to >= Date.now() / 1000 && (
-          <Div
-            style={{
-              marginBottom: 8,
-              width: "100%",
-              opacity: 1,
-              color: "red",
-              textAlign: "center",
-              paddingLeft: 0,
-              paddingRight: 0,
-            }}
-          >
+          <Div className="fettered-message">
             Вы будете в цепях еще{" "}
             {getSubDate(new Date(userSlave.fetter_to * 1000))}
           </Div>

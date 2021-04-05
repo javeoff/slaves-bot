@@ -132,7 +132,7 @@ const Rating: FC<IProps> = ({
               showHeader={false}
               showPosition={true}
               label="slaves_count"
-              showProfitPerMin={false}
+              showProfitPerMin={true}
               pageOpened={PAGE_RATING_USER}
               router={router}
             ></SlavesList>

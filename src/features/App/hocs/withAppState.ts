@@ -13,6 +13,7 @@ const mapStateToProps = (state: IRootState) => ({
 });
 
 const mapStateToCurrentUserProps = (state: IRootState) => {
+  console.log("Send props with current user info", Date.now());
   let userSlaves: Record<number, ISlaveData> = {};
   for (let slaveId in state.app.slaves) {
     if (state.app.slaves[slaveId].master_id == state.app.currentUserId) {
