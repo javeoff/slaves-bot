@@ -1,3 +1,5 @@
+import { ISlaveWithUserInfo } from "./types/ISlaveWithUserInfo";
+
 export const getSubDate = (d: Date): string => {
   let curTime = Date.now();
   let delta = (d.getTime() - curTime) / 1000;
@@ -41,4 +43,49 @@ export const toFixedSize = (
   showDots: boolean = false
 ): string => {
   return str.slice(0, size) + (str.length > size && showDots ? "..." : "");
+};
+
+export const sortByKey = (key = "") => {
+  return (a: any, b: any) => {
+    if (a[key] < b[key]) {
+      return -1;
+    }
+
+    if (a[key] > b[key]) {
+      return 1;
+    }
+    return 0;
+  };
+};
+
+export const searchFilter = (searchQuery: string) => {
+  let query = searchQuery.toLocaleLowerCase().split(" ");
+  let firstName = query[0] || "";
+  let lastName = query[1] || "";
+
+  return (s: ISlaveWithUserInfo): boolean => {
+    if (firstName || lastName) {
+      let userFirstName = s.user_info.first_name.toLocaleLowerCase();
+      let userLastName = s.user_info.last_name.toLocaleLowerCase();
+      if (firstName && !lastName) {
+        return (
+          userFirstName.startsWith(firstName) ||
+          userLastName.startsWith(firstName)
+        );
+      } else if (firstName && lastName) {
+        return (
+          (userFirstName.startsWith(firstName) &&
+            userLastName.startsWith(lastName)) ||
+          (userFirstName.startsWith(lastName) &&
+            userLastName.startsWith(firstName))
+        );
+      } else if (!firstName && lastName) {
+        return (
+          userFirstName.startsWith(lastName) ||
+          userLastName.startsWith(lastName)
+        );
+      }
+    }
+    return true;
+  };
 };

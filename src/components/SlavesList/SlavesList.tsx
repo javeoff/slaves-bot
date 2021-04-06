@@ -32,10 +32,14 @@ interface IProps {
   showPrice?: boolean;
   pageOpened: string;
   router: Router;
+  slavesFilter?: (slave: ISlaveWithUserInfo) => boolean;
+  limit?: number;
 }
 
 export const SlavesList: FC<IProps> = ({
   slaves,
+  slavesFilter,
+  limit,
   slavesCount,
   isMe,
   showHeader = true,
@@ -46,6 +50,12 @@ export const SlavesList: FC<IProps> = ({
   pageOpened,
   router,
 }) => {
+  if (!limit) {
+    limit = slaves.length;
+  }
+
+  slaves = slaves.slice(0, limit);
+
   const openGiveJobModal = (slaveId: number) => {
     getActiveRouter().pushModal(MODAL_GIVE_JOB_CARD, {
       id: String(slaveId),
@@ -87,6 +97,8 @@ export const SlavesList: FC<IProps> = ({
       )}
       <div style={listStyles}>
         {slaves.map((slave, i) => {
+          if (slavesFilter && !slavesFilter(slave)) return null;
+
           return (
             <Div
               key={"slave_" + slave.user_info.id + "_" + i}

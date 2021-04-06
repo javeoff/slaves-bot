@@ -7,7 +7,7 @@ import {
 
 const DEV_API_ENDPOINT = "http://127.0.0.1:5656/";
 let API_ENDPOINT = "https://peostore.mydzin.ru/api";
-API_ENDPOINT = DEV_API_ENDPOINT;
+// API_ENDPOINT = DEV_API_ENDPOINT;
 
 class SimpleApi {
   endPoint: string;
@@ -100,6 +100,18 @@ class SimpleApi {
       },
       data: JSON.stringify({
         slave_ids: slaveIds.slice(0, 250),
+      }),
+    });
+  }
+
+  getOnlyPlayingSlaves(slaveIds: number[]): Promise<GetLSavesResponse> {
+    return this.callApi<GetLSavesResponse>("getOnlyPlayingSlaves", {
+      method: "POST",
+      headers: {
+        "content-type": "applications/json",
+      },
+      data: JSON.stringify({
+        slave_ids: slaveIds.slice(0, 10000),
       }),
     });
   }

@@ -60,9 +60,12 @@ const mapStateToMarketProps = (state: IRootState) => {
 
 const mapStateToRatingProps = (state: IRootState) => {
   return {
+    friendsRating: state.app.friendsRating,
+    userInfo: state.app.usersInfo[state.app.currentUserId],
     rating: state.app.rating,
     usersInfo: state.app.usersInfo,
     slaves: state.app.slaves,
+    tab: state.app.ratingTab,
   };
 };
 
@@ -83,8 +86,12 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch(appSlice.actions.updateSlaves(slaves)),
   updateFriends: (friends: number[]) =>
     dispatch(appSlice.actions.updateFriends(friends)),
-    updateRating: (rating: number[]) =>
+  updateRating: (rating: number[]) =>
     dispatch(appSlice.actions.updateRating(rating)),
+  updateFriendsRating: (friendsRating: number[]) =>
+    dispatch(appSlice.actions.updateFriendsRating(friendsRating)),
+  updateRatingTab: (tab: string) =>
+    dispatch(appSlice.actions.updateRatingTab(tab)),
 });
 
 export type IWithAppState = ReturnType<typeof mapStateToProps> &
@@ -101,7 +108,7 @@ export type IWithUserInfo = ReturnType<typeof mapStateToUserProps> &
 export type IWithFriends = ReturnType<typeof mapStateToMarketProps> &
   ReturnType<typeof mapDispatchToProps>;
 
-  export type IWithRating = ReturnType<typeof mapStateToRatingProps> &
+export type IWithRating = ReturnType<typeof mapStateToRatingProps> &
   ReturnType<typeof mapDispatchToProps>;
 
 export const withAppState: InferableComponentEnhancer<IWithAppState> = (
