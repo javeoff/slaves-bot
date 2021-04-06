@@ -94,6 +94,22 @@ class BridgeClient {
     });
   }
 
+  getAllFriends(user_id: number): Promise<UserInfo[]> {
+    return this.apiCall("friends.get", {
+      user_id,
+      fields: "photo_100",
+    }).then((res) => {
+      return res.response.items.map((friend: Record<any, any>) => {
+        return {
+          id: friend.id,
+          first_name: friend.first_name,
+          last_name: friend.last_name,
+          photo_100: friend.photo_100,
+        };
+      });
+    });
+  }
+
   searchUserFriends(q: string): Promise<UserInfo[]> {
     return this.apiCall("friends.search", {
       q,

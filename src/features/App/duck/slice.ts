@@ -11,16 +11,20 @@ const initialState: IAppState = {
   friends: [],
   userAccessToken: "",
   rating: [],
+  friendsRating: [],
+  ratingTab: "global-rating",
 };
 
 export interface IAppState {
   currentUserId: number;
   userAccessToken: string;
   friends: number[];
+  friendsRating: number[];
   rating: number[];
   slaves: Record<number, ISlaveData>; // Объект с информацией о рабах с сервера
   usersInfo: Record<number, UserInfo>; // Объект из {1: UserInfo, 2: UserInfo}
   usersData: Record<number, IUserData>; // Объект с упрощенной информацией о каждом пользователе
+  ratingTab: string;
 }
 
 export const appSlice = createSlice({
@@ -44,7 +48,13 @@ export const appSlice = createSlice({
       draft.friends = action.payload;
     },
     updateRating: (draft, action: PayloadAction<number[]>) => {
-      draft.rating = action.payload
+      draft.rating = action.payload;
+    },
+    updateFriendsRating: (draft, action: PayloadAction<number[]>) => {
+      draft.friendsRating = action.payload;
+    },
+    updateRatingTab: (draft, action: PayloadAction<string>) => {
+      draft.ratingTab = action.payload;
     },
     updateUserInfo: (draft, action: PayloadAction<UserInfo>) => {
       console.log(action);

@@ -12,5 +12,6 @@
   padding-right: 0;
 }
 
-.button-link {
+.new-user-card .ModalCard__in {
+  max-width: 520px;
 }

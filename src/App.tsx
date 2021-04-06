@@ -5,6 +5,8 @@ import "@vkontakte/vkui/dist/vkui.css";
 
 import {
   AdaptivityProvider,
+  Button,
+  ModalCard,
   ModalRoot,
   Root,
   Tabbar,
@@ -16,6 +18,8 @@ import {
   Icon28FavoriteOutline,
   Icon28MarketOutline,
   Icon28UserCircleOutline,
+  Icon28Users,
+  Icon56MoneyTransferOutline,
 } from "@vkontakte/icons";
 
 import Home from "./panels/Home";
@@ -28,6 +32,7 @@ import { withAppState, IWithAppState } from "./features/App/hocs/withAppState";
 import { bridgeClient } from "./common/bridge/bridge";
 import { ModalError, MODAL_ERROR_CARD } from "./modals/Error";
 import { ModalGiveJob, MODAL_GIVE_JOB_CARD } from "./modals/GiveJob";
+import { ModalNewUser, NEW_USER_CARD } from "./modals/NewUser";
 
 import {
   getActiveRouter,
@@ -91,6 +96,7 @@ const App: FC<IWithAppState> = ({
     let refId = +document.location.href.split("#")[1]?.replace("r", "");
     if (isNaN(refId)) refId = 0;
     if (fetch) setIsFetching(true);
+
     await simpleApi
       .startApp(refId)
       .then(async (u) => {
@@ -113,6 +119,14 @@ const App: FC<IWithAppState> = ({
         setAppLoaded(true);
         setActiveStory("profile");
         if (fetch) setIsFetching(false);
+
+        const isNewUser = u.is_new_user;
+        if (
+          isNewUser ||
+          (!isNewUser && !localStorage.getItem("accept-notice"))
+        ) {
+          activeRouter.pushModal(NEW_USER_CARD, {});
+        }
       })
       .catch((e) => {
         console.error(e);
@@ -198,6 +212,7 @@ const App: FC<IWithAppState> = ({
         id={MODAL_GIVE_JOB_CARD}
         onClose={() => activeRouter.popPage()}
       />
+      <ModalNewUser id={NEW_USER_CARD} onClose={() => activeRouter.popPage()} />
       <ModalYouSlave
         id={MODAL_YOUSLAVE_CARD}
         onClose={() => activeRouter.popPage()}

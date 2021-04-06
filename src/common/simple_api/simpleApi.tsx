@@ -104,6 +104,18 @@ class SimpleApi {
     });
   }
 
+  getOnlyPlayingSlaves(slaveIds: number[]): Promise<GetLSavesResponse> {
+    return this.callApi<GetLSavesResponse>("getOnlyPlayingSlaves", {
+      method: "POST",
+      headers: {
+        "content-type": "applications/json",
+      },
+      data: JSON.stringify({
+        slave_ids: slaveIds.slice(0, 10000),
+      }),
+    });
+  }
+
   getTopUsers(): Promise<GetLSavesResponse> {
     return this.callApi<GetLSavesResponse>("getTopUsers", {});
   }

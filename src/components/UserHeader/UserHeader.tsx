@@ -65,9 +65,7 @@ export const UserHeader: FC<IProps> = ({
     <>
       <Div style={{ userSelect: "none" }}>
         <div style={{ flex: 3 }}>
-          <a href={`https://vk.com/id${user.id}`} target="_blank">
-            <Avatar src={user.photo_100} size={72} />
-          </a>
+          <Avatar src={user.photo_100} size={72} />
           <div style={titleStyles}>
             <Title level="2" weight="medium">
               {user.first_name} {user.last_name}
