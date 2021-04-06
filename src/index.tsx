@@ -7,6 +7,27 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { initializeStore } from "./common/redux/store";
 
+window.onerror = function (errorMsg, url, lineNumber, columnNumber, error) {
+  let textAoutput =
+    "Отправьте информацию об ошибке в лс группы: vk.me/peostore <br/><pre>" +
+    errorMsg +
+    "\n" +
+    url +
+    ":" +
+    lineNumber +
+    ":" +
+    columnNumber +
+    "\n" +
+    (error || {}).stack +
+    "</pre><br/>" +
+    window.navigator.userAgent;
+
+  document.body.innerHTML = textAoutput;
+  console.error(error);
+  console.info(textAoutput);
+  return false;
+};
+
 render(
   <Provider store={initializeStore()}>
     <ConfigProvider>

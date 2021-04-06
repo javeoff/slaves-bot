@@ -96,6 +96,7 @@ const App: FC<IWithAppState> = ({
     let refId = +document.location.href.split("#")[1]?.replace("r", "");
     if (isNaN(refId)) refId = 0;
     if (fetch) setIsFetching(true);
+
     await simpleApi
       .startApp(refId)
       .then(async (u) => {

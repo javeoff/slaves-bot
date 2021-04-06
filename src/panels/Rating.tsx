@@ -116,17 +116,24 @@ const Rating: FC<IProps> = ({
 
       await simpleApi.getOnlyPlayingSlaves(friensIds).then((slaves) => {
         updateSlaves(slaves);
+        const slaves_ids: number[] = [];
 
         setFriendsRatingList(
           slaves
-            .map((slave_object) => ({
-              user_info: friendsInfo[slave_object.id],
-              slave_object,
-            }))
+            .map((slave_object) => {
+              slaves_ids.push(slave_object.id);
+
+              return {
+                user_info: friendsInfo[slave_object.id],
+                slave_object,
+              };
+            })
             .sort(sortByKey)
         );
+
+        updateFriendsRating(slaves_ids);
       });
-      await updateFriendsRating(friensIds);
+
       await updateUsersInfo(friendsList);
       setLoadedFriendsTopUsers(true);
       setLoadedFriendsTopUsersInfo(true);
