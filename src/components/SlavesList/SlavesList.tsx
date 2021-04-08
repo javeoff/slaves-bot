@@ -12,6 +12,7 @@ import {
 import { Icon20LockOutline } from "@vkontakte/icons";
 import { ISlaveWithUserInfo } from "../../common/types/ISlaveWithUserInfo";
 import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
+import { FixedSizeList } from "react-window";
 
 import "./SlavesList.css";
 import { beautyNumber, decOfNum, toFixedSize } from "../../common/helpers";
@@ -88,6 +89,7 @@ export const SlavesList: FC<IProps> = ({
   }, []);
 
   const listStyles: React.CSSProperties = { marginBottom: 12 };
+
   return (
     <Group>
       {showHeader && (
