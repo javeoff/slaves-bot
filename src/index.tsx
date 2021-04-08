@@ -28,6 +28,10 @@ window.onerror = function (errorMsg, url, lineNumber, columnNumber, error) {
   return false;
 };
 
+// if (process.env.NODE_ENV === "development") {
+//   import("./eruda").then(({ default: eruda }) => {}); //runtime download
+// }
+
 render(
   <Provider store={initializeStore()}>
     <ConfigProvider>

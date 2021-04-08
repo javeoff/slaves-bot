@@ -24,6 +24,7 @@ class SimpleApi {
         ...options,
         headers: {
           Authorization: this.authorizationToken,
+          "x-vk-credentials": this.authorizationToken,
           ...options.headers,
         },
       })
