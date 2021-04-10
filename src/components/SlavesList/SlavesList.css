@@ -23,7 +23,7 @@
 .slaves-list--item {
   padding-bottom: 0px;
   cursor: pointer;
-  max-height: 120px;
+  /* max-height: 120px; */
   user-select: none;
 }
 

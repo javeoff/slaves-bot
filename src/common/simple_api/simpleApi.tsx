@@ -6,7 +6,7 @@ import {
 } from "./types";
 
 const DEV_API_ENDPOINT = "http://127.0.0.1:5656/";
-let API_ENDPOINT = "http://localhost:5656";
+let API_ENDPOINT = "https://peostore.mydzin.ru/api/";
 // API_ENDPOINT = DEV_API_ENDPOINT;
 
 class SimpleApi {

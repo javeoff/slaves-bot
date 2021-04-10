@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import {
   Avatar,
   Button,
@@ -35,6 +35,7 @@ interface IProps {
   router: Router;
   slavesFilter?: (slave: ISlaveWithUserInfo) => boolean;
   limit?: number;
+  limitShow?: boolean;
 }
 
 export const SlavesList: FC<IProps> = ({
@@ -50,7 +51,10 @@ export const SlavesList: FC<IProps> = ({
   showPrice = false,
   pageOpened,
   router,
+  limitShow = false,
 }) => {
+  const showOnlyDefault = !limitShow ? 10000 : 100;
+  console.log(showOnlyDefault);
   if (!limit) {
     limit = slaves.length;
   }
@@ -62,6 +66,8 @@ export const SlavesList: FC<IProps> = ({
       id: String(slaveId),
     });
   };
+
+  const [showOnly, setShowOnly] = useState<number>(showOnlyDefault);
 
   const openSlave = (slaveId: number) => {
     router.pushPageRoute(pageOpened, { id: String(slaveId) });
@@ -88,8 +94,26 @@ export const SlavesList: FC<IProps> = ({
     }
   }, []);
 
-  const listStyles: React.CSSProperties = { marginBottom: 12 };
+  useEffect(() => {
+    const scrollListener = () => {
+      if (
+        window.innerHeight + window.scrollY - (61 + 48) >=
+        document.body.offsetHeight
+      ) {
+        setShowOnly(showOnly + showOnlyDefault);
+      }
+    };
+    window.addEventListener("scroll", scrollListener);
+    return () => {
+      window.removeEventListener("scroll", scrollListener);
+    };
+  }, []);
 
+  const listStyles: React.CSSProperties = { marginBottom: 12 };
+  let showed = 0;
+  if (!slavesFilter) {
+    slaves = slaves.slice(0, showOnly);
+  }
   return (
     <Group>
       {showHeader && (
@@ -97,10 +121,11 @@ export const SlavesList: FC<IProps> = ({
           {isMe ? "Мои рабы" : "Рабов"}
         </Header>
       )}
-      <div style={listStyles}>
+      <div style={listStyles} id="slaves-list">
         {slaves.map((slave, i) => {
           if (slavesFilter && !slavesFilter(slave)) return null;
-
+          showed++;
+          if (showed > showOnly) return null;
           return (
             <Div
               key={"slave_" + slave.user_info.id + "_" + i}

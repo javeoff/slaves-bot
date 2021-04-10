@@ -203,6 +203,9 @@ const User: FC<IProps> = ({
     simpleApi.sellSlave(slave.id).then(syncNewSlave).catch(openErrorModal);
   };
 
+  const slavesListStyles =
+    slave.id === currentUserInfo.id ? {} : { marginBottom: 128 };
+
   return (
     <Panel key={key} id={panelId}>
       <PanelHeader
@@ -233,13 +236,14 @@ const User: FC<IProps> = ({
         ></UserHeader>
       )}
       {!loading && (
-        <div style={{ marginBottom: 128 }}>
+        <div style={slavesListStyles}>
           <SlavesList
             isMe={slave.id === currentUserInfo.id}
             slavesCount={slave.slaves_count}
             slaves={userSlaves}
             router={router}
             pageOpened={pageOpened}
+            limitShow={true}
           ></SlavesList>
         </div>
       )}

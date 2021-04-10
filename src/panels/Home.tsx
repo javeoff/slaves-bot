@@ -157,15 +157,13 @@ const Home: FC<IProps> = ({
             {getSubDate(new Date(userSlave.fetter_to * 1000))}
           </Div>
         )}
-        <div style={slaveListStyles}>
-          <SlavesList
-            slavesCount={userSlave.slaves_count}
-            slaves={generatedSlavesList}
-            isMe={true}
-            pageOpened={PAGE_PROFILE_USER}
-            router={router}
-          ></SlavesList>
-        </div>
+        <SlavesList
+          slavesCount={userSlave.slaves_count}
+          slaves={generatedSlavesList}
+          isMe={true}
+          pageOpened={PAGE_PROFILE_USER}
+          router={router}
+        ></SlavesList>
       </PullToRefresh>
     </Panel>
   );

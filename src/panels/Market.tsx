@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
 import { UserInfo } from "@vkontakte/vk-bridge";
@@ -21,6 +21,7 @@ import {
 import { SlavesList } from "../components/SlavesList/SlavesList";
 import { Router } from "../common/custom-router";
 import { PAGE_MARKET_USER } from "../common/routes";
+import { shuffle } from "../common/helpers";
 
 interface IProps extends IWithFriends {
   id?: string;
@@ -97,6 +98,7 @@ const Market: FC<IProps> = ({
     await bridgeClient
       .getUserFriends(userInfo.id)
       .then(async (newFriends) => {
+        shuffle(newFriends);
         await updateMarketList(newFriends);
       })
       .catch(openErrorModal);
@@ -171,7 +173,17 @@ const Market: FC<IProps> = ({
       }
     });
   }
-  console.log("Market list", marketList.length, loading);
+
+  const onChangeCallback = useCallback((e) => {
+    let val = e.target.value;
+    clearTimeout(timerSearch);
+    timerSearch = setTimeout(() => {
+      setSearchValue(val);
+    }, 100);
+  }, []);
+
+  const fixedContentBodyStyles = { marginTop: 60 };
+
   return (
     <Panel id={id}>
       <PanelHeader>Маркет</PanelHeader>
@@ -180,19 +192,9 @@ const Market: FC<IProps> = ({
       ) : (
         <>
           <FixedLayout vertical="top">
-            <Search
-              defaultValue=""
-              onChange={(e) => {
-                let val = e.target.value;
-                clearTimeout(timerSearch);
-                timerSearch = setTimeout(() => {
-                  setSearchValue(val);
-                }, 100);
-              }}
-              after={null}
-            />
+            <Search defaultValue="" onChange={onChangeCallback} after={null} />
           </FixedLayout>
-          <div style={{ marginTop: 60 }}>
+          <div style={fixedContentBodyStyles}>
             <PullToRefresh
               onRefresh={refreshMarketUsers}
               isFetching={isFetching}
