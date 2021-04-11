@@ -1,7 +1,14 @@
 import React, { FC, ReactElement, useEffect, useState } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
-import { Avatar, Button, Div, PullToRefresh, Snackbar } from "@vkontakte/vkui";
+import {
+  Avatar,
+  Button,
+  Div,
+  PanelHeaderButton,
+  PullToRefresh,
+  Snackbar,
+} from "@vkontakte/vkui";
 
 import {
   IWithCurrentUserInfo,
@@ -12,7 +19,7 @@ import { SlavesList } from "../components/SlavesList/SlavesList";
 import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { AnyFunction } from "@vkontakte/vkjs";
 import { simpleApi } from "../common/simple_api/simpleApi";
-import { Icon16Done } from "@vkontakte/icons";
+import { Icon16Done, Icon28DeleteOutline } from "@vkontakte/icons";
 import { getSubDate } from "../common/helpers";
 import { InfoBlock } from "../components/InfoBlock/InfoBlock";
 import { Icon32LinkCircleOutline } from "@vkontakte/icons";
@@ -21,6 +28,7 @@ import { getActiveRouter, PAGE_PROFILE_USER } from "../common/routes";
 import { Router } from "../common/custom-router";
 import { openErrorModal } from "../modals/openers";
 import { MODAL_YOUSLAVE_CARD } from "../modals/YouSlave";
+import { DeleteAccountAlert } from "../popouts/deleteAccountAlert";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
@@ -121,12 +129,23 @@ const Home: FC<IProps> = ({
     );
   };
 
-  const slaveListStyles = { marginBottom: 56 };
-
   console.log("Complete render user page", Date.now());
   return (
     <Panel id={id}>
-      <PanelHeader>Рабы</PanelHeader>
+      <PanelHeader
+        left={
+          <PanelHeaderButton
+            onClick={() => {
+              router.pushPopout(<DeleteAccountAlert />, {});
+            }}
+            primary={false}
+          >
+            <Icon28DeleteOutline />
+          </PanelHeaderButton>
+        }
+      >
+        Профиль
+      </PanelHeader>
       <PullToRefresh isFetching={isFetching} onRefresh={onRefresh}>
         {snack}
         <UserHeader
@@ -139,18 +158,20 @@ const Home: FC<IProps> = ({
           router={router}
           currentUserId={userInfo.id}
         ></UserHeader>
-        <Div>
-          <InfoBlock
-            icon={<Icon32LinkCircleOutline fill="#fff" />}
-            title="Первые рабы"
-            subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
-            action={
-              <Button mode="overlay_secondary" onClick={copyRefLink}>
-                vk.com/app7809644#r{userInfo.id}
-              </Button>
-            }
-          ></InfoBlock>
-        </Div>
+        {userSlave.slaves_count <= 10 && (
+          <Div>
+            <InfoBlock
+              icon={<Icon32LinkCircleOutline fill="#fff" />}
+              title="Первые рабы"
+              subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
+              action={
+                <Button mode="overlay_secondary" onClick={copyRefLink}>
+                  vk.com/app7809644#r{userInfo.id}
+                </Button>
+              }
+            ></InfoBlock>
+          </Div>
+        )}
         {userSlave.fetter_to >= Date.now() / 1000 && (
           <Div className="fettered-message">
             Вы будете в цепях еще{" "}

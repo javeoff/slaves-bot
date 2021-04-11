@@ -5,8 +5,9 @@ import {
   IUserDataResponseDto,
 } from "./types";
 
-const DEV_API_ENDPOINT = "http://127.0.0.1:5656/";
-let API_ENDPOINT = "https://peostore.mydzin.ru/api/";
+const DEV_API_ENDPOINT = "http://localhost:5656";
+const PROD_API_ENDPOINT = "https://peostore.mydzin.ru/api";
+export let API_ENDPOINT = PROD_API_ENDPOINT;
 // API_ENDPOINT = DEV_API_ENDPOINT;
 
 class SimpleApi {
@@ -31,7 +32,7 @@ class SimpleApi {
         .then((res) => {
           let bodyData: any = res;
           try {
-            if (bodyData.data.payload) {
+            if (bodyData.data.payload && methodName) {
               resolve(bodyData.data.payload);
             } else {
               reject(new Error(bodyData.data.error_message));
@@ -57,6 +58,18 @@ class SimpleApi {
       params: {
         id: userId,
       },
+    });
+  }
+
+  deleteMyAccount(): Promise<boolean> {
+    return this.callApi<boolean>("deleteMyAccount", {
+      params: {},
+    });
+  }
+
+  restoreMyAccount(): Promise<boolean> {
+    return this.callApi<boolean>("restoreMyAccount", {
+      params: {},
     });
   }
 

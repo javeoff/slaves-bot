@@ -34,4 +34,6 @@ export const DefaultSlave: ISlaveData = {
   slaves_profit_per_min: 0,
   balance: 0,
   last_time_update: 0,
+  accepted_terms: false,
+  deleted: false,
 };

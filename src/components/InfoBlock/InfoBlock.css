@@ -1,6 +1,6 @@
 .info-block {
   padding: 18px 22px 22px 22px;
-  border-radius: 18px;
+  border-radius: 12px;
   background-color: var(--content_tint_backgroun);
   color: var(--text_primary);
   display: flex;

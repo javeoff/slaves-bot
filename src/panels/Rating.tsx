@@ -316,7 +316,7 @@ const Rating: FC<IProps> = ({
       {loading && <PanelSpinner size="large"></PanelSpinner>}
       {!loading && (
         <PullToRefresh onRefresh={refreshRatingUsers} isFetching={isFetching}>
-          <Div>
+          <Div style={{ paddingBottom: 0 }}>
             <Group>
               <Tabs mode="segmented">
                 <TabsItem

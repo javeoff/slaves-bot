@@ -125,7 +125,9 @@ const Market: FC<IProps> = ({
         setLoadedFriendsSlaves(true);
         setMarketList(marketList);
       } else {
-        await reloadFriends();
+        if (!alreadyGotMarketList.length) {
+          await reloadFriends();
+        }
       }
     };
     void loadMarket();
@@ -209,6 +211,9 @@ const Market: FC<IProps> = ({
                   showProfitPerMin={false}
                   router={router}
                   pageOpened={PAGE_MARKET_USER}
+                  slavesFilter={(item: ISlaveWithUserInfo) => {
+                    return !item.slave_object.deleted;
+                  }}
                 />
               ) : (
                 <Div>

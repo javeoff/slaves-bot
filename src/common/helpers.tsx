@@ -15,6 +15,14 @@ export const getSubDate = (d: Date): string => {
   ])} и ${minutes} ${decOfNum(minutes, ["минуту", "минуты", "минут"])}`;
 };
 
+export const sleep = (ts: number): Promise<void> => {
+  return new Promise((resolve, _) => {
+    setTimeout(() => {
+      resolve();
+    }, ts);
+  });
+};
+
 export const decOfNum = (number: number, titles: string[]): string => {
   let decCases = [2, 0, 1, 1, 1, 2];
   return titles[
@@ -24,7 +32,14 @@ export const decOfNum = (number: number, titles: string[]): string => {
   ];
 };
 
+export const beautyNumberDot = (n: number): string => {
+  return String(n).replace(/\./g, ",");
+};
+
 export const beautyNumber = (number: number): string => {
+  if (number >= 1000000000)
+    return beautyNumberDot(Math.floor(number / 100000000) / 10) + " млрд.";
+
   let str = "";
   let numberString = String(number).split("");
   numberString.reverse().forEach((n, i) => {

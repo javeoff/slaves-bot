@@ -13,6 +13,7 @@ const initialState: IAppState = {
   rating: [],
   friendsRating: [],
   ratingTab: "global-rating",
+  loadedUsers: [],
 };
 
 export interface IAppState {
@@ -25,6 +26,7 @@ export interface IAppState {
   usersInfo: Record<number, UserInfo>; // Объект из {1: UserInfo, 2: UserInfo}
   usersData: Record<number, IUserData>; // Объект с упрощенной информацией о каждом пользователе
   ratingTab: string;
+  loadedUsers: number[]
 }
 
 export const appSlice = createSlice({
@@ -68,6 +70,9 @@ export const appSlice = createSlice({
     },
     updateUserAccessToken: (draft, action: PayloadAction<string>) => {
       draft.userAccessToken = action.payload;
+    },
+    setUserLoaded: (draft, action: PayloadAction<number>) => {
+      draft.loadedUsers.push(action.payload);
     },
   },
 });

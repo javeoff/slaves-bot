@@ -57,6 +57,7 @@ import { Router } from "./common/custom-router";
 import { MODAL_YOUSLAVE_CARD, ModalYouSlave } from "./modals/YouSlave";
 import "./App.css";
 import { openErrorModal } from "./modals/openers";
+import Deleted from "./panels/Deleted";
 
 const useRouter = (router: Router) => {
   let [r, setRouterChanged] = useState<string>("");
@@ -77,6 +78,7 @@ const App: FC<IWithAppState> = ({
   updateUserAccessToken,
   updateSlaves,
   updateUsersInfo,
+  app,
 }) => {
   useRouter(router);
   useRouter(marketRouter);
@@ -89,6 +91,7 @@ const App: FC<IWithAppState> = ({
   >("loading");
 
   const LOADING_PANEL = "loading";
+  const DELETED_PANEL = "deleted";
 
   const reloadUserInformation = async (fetch: boolean = false) => {
     console.log("Reload user info");
@@ -116,7 +119,11 @@ const App: FC<IWithAppState> = ({
         }
         updateUsersInfo(users);
         updateSlaves(u.slaves);
-        setAppLoaded(true);
+
+        if (!u.user.deleted) {
+          setAppLoaded(true);
+        }
+
         setActiveStory("profile");
         if (fetch) setIsFetching(false);
 
@@ -220,11 +227,22 @@ const App: FC<IWithAppState> = ({
     </ModalRoot>
   );
 
-  console.log("Render app", Date.now());
+  const popout = activeRouter.getPopout();
+  const accountDeleted =
+    app.slaves &&
+    app.slaves[app.currentUserId] &&
+    app.slaves[app.currentUserId].deleted;
+
   return (
     <AdaptivityProvider>
       <Epic
-        activeStory={appLoaded ? activeStory : LOADING_PANEL}
+        activeStory={
+          appLoaded
+            ? activeStory
+            : accountDeleted
+            ? DELETED_PANEL
+            : LOADING_PANEL
+        }
         tabbar={
           appLoaded ? (
             <Tabbar>
@@ -268,8 +286,22 @@ const App: FC<IWithAppState> = ({
             <Loading id={LOADING_PANEL} />
           </View>
         </Root>
+        <Root id="deleted" activeView={DELETED_PANEL}>
+          <View
+            id={DELETED_PANEL}
+            modal={modal}
+            activePanel={String(DELETED_PANEL)}
+          >
+            <Deleted id={DELETED_PANEL} />
+          </View>
+        </Root>
         <Root id="profile" activeView="profile">
-          <View id="profile" modal={modal} activePanel={router.getPanelId()}>
+          <View
+            id="profile"
+            popout={popout}
+            modal={modal}
+            activePanel={router.getPanelId()}
+          >
             <Home
               id={PAGE_PROFILE_PANEL}
               onRefresh={() => reloadUserInformation(true)}

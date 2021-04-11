@@ -15,4 +15,6 @@ export interface ISlaveData {
   last_time_update: number;
   slaves_count: number;
   slaves_profit_per_min: number;
+  deleted: boolean;
+  accepted_terms: boolean;
 }

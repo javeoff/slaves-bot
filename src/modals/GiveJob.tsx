@@ -61,7 +61,7 @@ export const ModalGiveJobPage: FC<IProps> = ({ id, onClose, updateSlaves }) => {
       }
     >
       <Group>
-        <Div>
+        <Div style={{ paddingBottom: 18 }}>
           <FormLayout
             onSubmit={(e) => {
               e.preventDefault();

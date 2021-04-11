@@ -123,7 +123,11 @@ export const SlavesList: FC<IProps> = ({
       )}
       <div style={listStyles} id="slaves-list">
         {slaves.map((slave, i) => {
-          if (slavesFilter && !slavesFilter(slave)) return null;
+          if (
+            (slavesFilter && !slavesFilter(slave)) ||
+            slave.slave_object.deleted
+          )
+            return null;
           showed++;
           if (showed > showOnly) return null;
           return (

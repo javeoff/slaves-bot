@@ -1,4 +1,6 @@
+import { ReactElement } from "react";
 import { bridgeClient } from "../bridge/bridge";
+import { sleep } from "../helpers";
 
 const { pathToRegexp, match } = require("path-to-regexp");
 
@@ -14,6 +16,11 @@ interface Page {
   isInfinity?: boolean;
 }
 
+interface Popout {
+  params: Record<string, string>;
+  element: ReactElement;
+}
+
 interface History {
   activeView: string;
   viewsHistory: string[];
@@ -21,6 +28,7 @@ interface History {
   modalsHistory: Record<string, Page[]>;
   infinityPanelsHistory: Record<string, string[]>;
   infinityPanelsTypes: Record<string, Record<string, string>>;
+  popoutsHistory: Record<string, Popout[]>;
 }
 
 type Routes = Record<string, Route>;
@@ -37,6 +45,7 @@ export class Router {
   isActive: boolean;
   _popHandler: VoidFunction;
   ignoreNextEvent: boolean;
+  openedModal: boolean;
 
   constructor(routes: Routes, defaultPath: string = "/") {
     this.history = {
@@ -46,6 +55,7 @@ export class Router {
       modalsHistory: {},
       infinityPanelsHistory: {},
       infinityPanelsTypes: {},
+      popoutsHistory: {},
     };
     this.routes = routes;
     this.updateHistoryListeners = [];
@@ -53,10 +63,12 @@ export class Router {
     this.panelsCounted = 0;
     this.isActive = false;
     this.ignoreNextEvent = false;
-    this._popHandler = (event?: any) => {
+    this.openedModal = false;
+
+    this._popHandler = async (event?: any) => {
       if (this.isActive) {
         if (!this.ignoreNextEvent) {
-          this.popChanges();
+          await this.popChanges();
         } else {
           this.ignoreNextEvent = false;
         }
@@ -80,9 +92,19 @@ export class Router {
   }
 
   // Применяем изменения кнопки "назад"
-  popChanges() {
-    if (this.getModalId()) {
-      this.history.modalsHistory[this.getViewId()].pop();
+  async popChanges() {
+    if (this.getPopout()) {
+      this.history.popoutsHistory[this.getViewId()].pop();
+      this.initUpdateHistory();
+    } else if (this.getModalId()) {
+      if (this.openedModal) {
+        console.log("Pop modal", JSON.stringify(this.history.modalsHistory));
+        this.history.modalsHistory[this.getViewId()].pop();
+        setTimeout(() => {
+          this.openedModal = false;
+        }, 600);
+        this.initUpdateHistory();
+      }
     } else {
       if (this.isInfinityPanel(this.getViewId())) {
         this.history.infinityPanelsHistory[this.getViewId()].pop();
@@ -110,12 +132,12 @@ export class Router {
         }
         this.history.activeView = this.getViewId();
       }
+      this.initUpdateHistory();
     }
-    this.initUpdateHistory();
   }
 
   // Системная функция
-  popHandler() {
+  async popHandler() {
     this.popChanges();
   }
 
@@ -285,12 +307,21 @@ export class Router {
 
   getModalId(): string | null {
     let modals = this.history.modalsHistory[this.getViewId()];
-    console.log("Modals", modals);
+    console.log("Modals", JSON.stringify(modals));
     return modals ? modals[modals.length - 1]?.id || null : null;
   }
 
-  pushModal(modalId: string, params: Record<string, string>) {
+  getPopout(): ReactElement | null {
+    let popouts = this.history.popoutsHistory[this.getViewId()];
+    return popouts ? popouts[popouts.length - 1]?.element || null : null;
+  }
+
+  async pushModal(modalId: string, params: Record<string, string>) {
     window.history.pushState("", "", null);
+    while (this.openedModal) {
+      await sleep(200);
+    }
+    this.openedModal = true;
     if (this.getViewId()) {
       if (!this.history.modalsHistory[this.getViewId()]) {
         this.history.modalsHistory[this.getViewId()] = [];
@@ -303,6 +334,21 @@ export class Router {
         });
         this.initUpdateHistory();
       }
+    }
+  }
+
+  async pushPopout(popout: ReactElement, params: Record<string, string>) {
+    window.history.pushState("", "", null);
+    this.openedModal = true;
+    if (this.getViewId()) {
+      if (!this.history.popoutsHistory[this.getViewId()]) {
+        this.history.popoutsHistory[this.getViewId()] = [];
+      }
+      this.history.popoutsHistory[this.getViewId()].push({
+        element: popout,
+        params,
+      });
+      this.initUpdateHistory();
     }
   }
 
