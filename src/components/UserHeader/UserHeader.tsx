@@ -2,7 +2,9 @@ import {
   Icon20PlayCircleFillSteelGray,
   Icon20StatisticCircleFillBlue,
   Icon20VotestTransferCircleFillTurquoise,
+  Icon24UserAddOutline,
   Icon24WriteOutline,
+  Icon28ChevronRightCircleOutline,
 } from "@vkontakte/icons";
 import { UserInfo } from "@vkontakte/vk-bridge";
 import {
@@ -10,15 +12,19 @@ import {
   Button,
   Card,
   Div,
+  IconButton,
   MiniInfoCell,
+  PullToRefresh,
+  SimpleCell,
   Title,
 } from "@vkontakte/vkui";
-import React, { FC, useCallback } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import { Router } from "../../common/custom-router";
 import { beautyNumber } from "../../common/helpers";
 import { ISlaveData } from "../../common/types/ISlaveData";
 import { MODAL_GIVE_JOB_CARD } from "../../modals/GiveJob";
 import { InfoBlock } from "../InfoBlock/InfoBlock";
+import { bridgeClient } from "../../common/bridge/bridge";
 
 interface IProps {
   user: UserInfo;
@@ -48,6 +54,17 @@ export const UserHeader: FC<IProps> = ({
   const masterAvatarStyles = { paddingRight: 0 };
   const freeButtonStyles = { paddingTop: 2 };
   const masterTakenStyles = { fontSize: 14 };
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+
+  useEffect(() => {
+    const loadIsSubscribed = async () => {
+      if (!isSubscribed) {
+        setIsSubscribed((await bridgeClient.isSubscribed()).response);
+      }
+    };
+    void loadIsSubscribed();
+  }, []);
+
   const buySelfCallback = useCallback(() => {
     onBuySelf();
   }, []);
@@ -104,6 +121,29 @@ export const UserHeader: FC<IProps> = ({
           </Div>
         ) : null}
       </div>
+      {!isSubscribed && (
+        <div style={{ marginTop: 6 }}>
+          <SimpleCell
+            before={
+              <Avatar
+                size={48}
+                src={
+                  "https://sun9-64.userapi.com/impg/Fi53nFGDUTwe_gyo_-eUPjUbG1N2SK6-Ie_BlA/1PjyJVLoUns.jpg?size=278x278&quality=96&sign=ccfcfe8f8733082765d9fc62b856499d&type=album"
+                }
+              />
+            }
+            description="Подписывайтесь и ставьте лайки"
+            onClick={() =>
+              bridgeClient.joinGroup().then(() => {
+                setIsSubscribed(true);
+              })
+            }
+          >
+            Наша группа ВКонтакте
+          </SimpleCell>
+        </div>
+      )}
+
       {master && master.id ? (
         <Div style={{ userSelect: "none" }}>
           <Card mode="outline">

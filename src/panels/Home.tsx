@@ -5,8 +5,10 @@ import {
   Avatar,
   Button,
   Div,
+  IconButton,
   PanelHeaderButton,
   PullToRefresh,
+  SimpleCell,
   Snackbar,
 } from "@vkontakte/vkui";
 
@@ -29,6 +31,8 @@ import { Router } from "../common/custom-router";
 import { openErrorModal } from "../modals/openers";
 import { MODAL_YOUSLAVE_CARD } from "../modals/YouSlave";
 import { DeleteAccountAlert } from "../popouts/deleteAccountAlert";
+
+import { Icon28ChevronRightCircleOutline } from "@vkontakte/icons";
 
 interface IProps extends IWithCurrentUserInfo {
   id?: string;

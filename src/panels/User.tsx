@@ -81,6 +81,8 @@ const User: FC<IProps> = ({
     defaultLoading = false;
   }
 
+  console.log("RELOADED FRIENDS");
+
   for (let slaveId in slaves) {
     if (slaves[slaveId].master_id === userId && usersInfo[slaveId]) {
       defaultUserSlaves.push({
@@ -122,20 +124,32 @@ const User: FC<IProps> = ({
         updateUserInfo(loadedUserInfo);
       }
       setUserInfo(loadedUserInfo);
-      await getUserFriends();
       setLoadedUserInfo(true);
     };
     void fetchUserInfo();
   }, []); // Первый запуск
 
+  useEffect(() => {
+    const getFriendsInfo = async () => {
+      if (!friendsIds[userInfo.id] && userInfo) await getUserFriends();
+    };
+    void getFriendsInfo();
+  }, [userInfo]);
+
   const getUserFriends = async () => {
     await bridgeClient
-      .getUserFriends(userInfo.id, 25)
+      .getAllFriends(userInfo.id)
+      .catch((): UserInfo[] => {
+        return [];
+      })
       .then(async (newFriends) => {
         shuffle(newFriends);
-        await updateFriendsIds({ [userInfo.id]: newFriends.map((u) => u.id) });
+        updateFriendsIds({
+          [userInfo.id]: newFriends.slice(0, 22).map((u) => u.id),
+        });
 
         updateUsersInfo(newFriends);
+        console.log("UPDATED FRIENDS");
       })
       .catch(openErrorModal);
   };
@@ -246,6 +260,10 @@ const User: FC<IProps> = ({
     setIsFetching(false);
   };
 
+  const openSlave = (slaveId: number) => {
+    router.pushPageRoute(pageOpened, { id: String(slaveId) });
+  };
+
   // Продажа
   const sellSlave = () => {
     simpleApi.sellSlave(slave.id).then(syncNewSlave).catch(openErrorModal);
@@ -288,29 +306,30 @@ const User: FC<IProps> = ({
             pageOpened={pageOpened}
             currentUserId={currentUserInfo.id}
           />
-          {friendsIds[userInfo.id] && (
-            <Group header={<Header mode="secondary">Недавние</Header>}>
-              <HorizontalScroll
-                showArrows={true}
-                getScrollToLeft={(i) => i - 120}
-                getScrollToRight={(i) => i + 120}
+          {!friendsIds[userInfo.id]?.length || (
+            <Group header={<Header mode="primary">Друзья</Header>}>
+              <Div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "flex-start",
+                }}
               >
-                <div style={{ display: "flex" }}>
-                  {friendsIds[userInfo.id].map((friendId) => {
-                    if (!usersInfo[friendId]) return null;
+                {friendsIds[userInfo.id].map((friendId) => {
+                  if (!usersInfo[friendId]) return null;
 
-                    return (
-                      <HorizontalCell
-                        style={{ width: 120 }}
-                        key={usersInfo[friendId]?.id}
-                        header={usersInfo[friendId].first_name}
-                      >
-                        <Avatar size={56} src={usersInfo[friendId].photo_100} />
-                      </HorizontalCell>
-                    );
-                  })}
-                </div>
-              </HorizontalScroll>
+                  return (
+                    <div style={{ padding: 4 }}>
+                      <Avatar
+                        size={46}
+                        onClick={() => openSlave(usersInfo[friendId]?.id)}
+                        src={usersInfo[friendId].photo_100}
+                        style={{ cursor: "pointer" }}
+                      />
+                    </div>
+                  );
+                })}
+              </Div>
             </Group>
           )}
           <div style={slavesListStyles}>
@@ -321,6 +340,8 @@ const User: FC<IProps> = ({
               router={router}
               pageOpened={pageOpened}
               limitShow={true}
+              showProfitPerMin={false}
+              showPrice={true}
             />
           </div>
           <FixedLayout vertical="bottom">

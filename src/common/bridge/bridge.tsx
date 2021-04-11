@@ -1,6 +1,7 @@
 import bridge, { UserInfo, ReceiveDataMap } from "@vkontakte/vk-bridge";
 
 const APP_ID = 7809644;
+const GROUP_ID = 203757860;
 type VKWebAppGetAuthTokenData = {
   access_token: string;
   scope: string;
@@ -40,6 +41,14 @@ class BridgeClient {
       status: "success",
       payload: {},
     });
+  }
+
+  joinGroup(): Promise<any> {
+    return bridge.send("VKWebAppJoinGroup", { group_id: GROUP_ID });
+  }
+
+  isSubscribed(): Promise<any> {
+    return this.apiCall("groups.isMember", { group_id: GROUP_ID });
   }
 
   getApiRequestId(): string {
