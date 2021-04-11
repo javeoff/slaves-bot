@@ -47,6 +47,7 @@ const mapStateToUserProps = (state: IRootState) => {
     usersInfo: state.app.usersInfo,
     slaves: state.app.slaves,
     loadedUsers: state.app.loadedUsers,
+    friendsIds: state.app.friendsIds,
   };
 };
 
@@ -95,6 +96,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch(appSlice.actions.updateRatingTab(tab)),
   setUserLoaded: (userId: number) =>
     dispatch(appSlice.actions.setUserLoaded(userId)),
+  updateFriendsIds: (userIds: Record<number, number[]>) =>
+    dispatch(appSlice.actions.updateFriendsIds(userIds)),
 });
 
 export type IWithAppState = ReturnType<typeof mapStateToProps> &

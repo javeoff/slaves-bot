@@ -127,11 +127,9 @@ const App: FC<IWithAppState> = ({
         setActiveStory("profile");
         if (fetch) setIsFetching(false);
 
-        const isNewUser = u.is_new_user;
-        if (
-          isNewUser ||
-          (!isNewUser && !localStorage.getItem("accept-notice"))
-        ) {
+        console.log("user", u.user);
+
+        if (!u.user.accepted_terms) {
           activeRouter.pushModal(NEW_USER_CARD, {});
         }
       })

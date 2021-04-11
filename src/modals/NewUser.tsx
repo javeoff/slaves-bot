@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import { Button, ModalCard } from "@vkontakte/vkui";
 import { Icon28WarningTriangleOutline } from "@vkontakte/icons";
+import { API_ENDPOINT } from "../common/simple_api/simpleApi";
 
 interface IProps {
   onClose: VoidFunction;
@@ -9,8 +10,9 @@ interface IProps {
 
 export const NEW_USER_CARD = "new-user-card";
 export const ModalNewUser: FC<IProps> = ({ onClose }) => {
-  const acceptNotice = () => {
-    localStorage.setItem("accept-notice", "accepted");
+  const acceptNotice = async () => {
+    // localStorage.setItem("accept-notice", "accepted");
+    await fetch(API_ENDPOINT + "/acceptTerms");
     onClose();
   };
 

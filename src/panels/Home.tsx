@@ -53,11 +53,7 @@ const Home: FC<IProps> = ({
     if (masterInfo?.id) {
       let refId = +document.location.href.split("#")[1]?.replace("r", "");
       if (isNaN(refId)) refId = 0;
-      if (
-        refId == userSlave.master_id &&
-        !localStorage.getItem("got_ref_info")
-      ) {
-        localStorage.setItem("got_ref_info", "true");
+      if (refId == userSlave.master_id) {
         openYouSlaveModal(
           `${userInfo.first_name}, теперь ты ${
             userInfo.sex === 1 ? "рабыня" : "раб"
@@ -158,6 +154,20 @@ const Home: FC<IProps> = ({
           router={router}
           currentUserId={userInfo.id}
         ></UserHeader>
+        {userSlave.slaves_count <= 10 && (
+          <Div>
+            <InfoBlock
+              icon={<Icon32LinkCircleOutline fill="#fff" />}
+              title="Первые рабы"
+              subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
+              action={
+                <Button mode="overlay_secondary" onClick={copyRefLink}>
+                  vk.com/app7809644#r{userInfo.id}
+                </Button>
+              }
+            ></InfoBlock>
+          </Div>
+        )}
         {userSlave.slaves_count <= 10 && (
           <Div>
             <InfoBlock

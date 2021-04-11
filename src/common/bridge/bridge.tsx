@@ -77,11 +77,11 @@ class BridgeClient {
     });
   }
 
-  getUserFriends(user_id: number): Promise<UserInfo[]> {
+  getUserFriends(user_id: number, limit: number): Promise<UserInfo[]> {
     return this.apiCall("friends.get", {
       user_id,
       fields: "photo_100",
-      count: 100,
+      count: limit,
     }).then((res) => {
       return res.response.items.map((friend: Record<any, any>) => {
         return {

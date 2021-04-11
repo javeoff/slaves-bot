@@ -96,7 +96,7 @@ const Market: FC<IProps> = ({
 
   const reloadFriends = async () => {
     await bridgeClient
-      .getUserFriends(userInfo.id)
+      .getUserFriends(userInfo.id, 100)
       .then(async (newFriends) => {
         shuffle(newFriends);
         await updateMarketList(newFriends);

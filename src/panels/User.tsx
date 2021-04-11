@@ -2,13 +2,19 @@ import React, { FC, useEffect, useState } from "react";
 import Panel from "@vkontakte/vkui/dist/components/Panel/Panel";
 import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader";
 import {
+  Avatar,
   Button,
   Div,
   FixedLayout,
+  Group,
+  Header,
+  HorizontalCell,
+  HorizontalScroll,
   PanelHeaderBack,
   PanelSpinner,
   Placeholder,
   PullToRefresh,
+  SizeType,
 } from "@vkontakte/vkui";
 import {
   Icon20FreezeOutline,
@@ -27,7 +33,7 @@ import { ISlaveWithUserInfo } from "../common/types/ISlaveWithUserInfo";
 import { API_ENDPOINT, simpleApi } from "../common/simple_api/simpleApi";
 import { bridgeClient } from "../common/bridge/bridge";
 import { IUserActionResponseDto } from "../common/simple_api/types";
-import { beautyNumber, getSubDate } from "../common/helpers";
+import { beautyNumber, getSubDate, shuffle } from "../common/helpers";
 import { openErrorModal } from "../modals/openers";
 import { Router } from "../common/custom-router";
 import { PAGE_MAIN } from "@happysanta/router";
@@ -53,6 +59,8 @@ const User: FC<IProps> = ({
   updateUsersInfo,
   updateUserInfo,
   setUserLoaded,
+  updateFriendsIds,
+  friendsIds,
 }) => {
   let params = router.getParams();
   let userId = Number(params.id);
@@ -114,10 +122,23 @@ const User: FC<IProps> = ({
         updateUserInfo(loadedUserInfo);
       }
       setUserInfo(loadedUserInfo);
+      await getUserFriends();
       setLoadedUserInfo(true);
     };
     void fetchUserInfo();
   }, []); // Первый запуск
+
+  const getUserFriends = async () => {
+    await bridgeClient
+      .getUserFriends(userInfo.id, 25)
+      .then(async (newFriends) => {
+        shuffle(newFriends);
+        await updateFriendsIds({ [userInfo.id]: newFriends.map((u) => u.id) });
+
+        updateUsersInfo(newFriends);
+      })
+      .catch(openErrorModal);
+  };
 
   const fetchSlaveData = async () => {
     let newSlaveData = await simpleApi.getUser(userId);
@@ -219,6 +240,7 @@ const User: FC<IProps> = ({
     setIsFetching(true);
     await fetchSlaveData();
     await loadMasterInfo();
+    await getUserFriends();
     setLoadedMasterInfo(true);
     setLoadedUserData(true);
     setIsFetching(false);
@@ -247,7 +269,7 @@ const User: FC<IProps> = ({
             }}
           />
         }
-      ></PanelHeader>
+      />
       <img
         src={imagePath + imageVersion}
         className="app-icon"
@@ -265,7 +287,32 @@ const User: FC<IProps> = ({
             router={router}
             pageOpened={pageOpened}
             currentUserId={currentUserInfo.id}
-          ></UserHeader>
+          />
+          {friendsIds[userInfo.id] && (
+            <Group header={<Header mode="secondary">Недавние</Header>}>
+              <HorizontalScroll
+                showArrows={true}
+                getScrollToLeft={(i) => i - 120}
+                getScrollToRight={(i) => i + 120}
+              >
+                <div style={{ display: "flex" }}>
+                  {friendsIds[userInfo.id].map((friendId) => {
+                    if (!usersInfo[friendId]) return null;
+
+                    return (
+                      <HorizontalCell
+                        style={{ width: 120 }}
+                        key={usersInfo[friendId]?.id}
+                        header={usersInfo[friendId].first_name}
+                      >
+                        <Avatar size={56} src={usersInfo[friendId].photo_100} />
+                      </HorizontalCell>
+                    );
+                  })}
+                </div>
+              </HorizontalScroll>
+            </Group>
+          )}
           <div style={slavesListStyles}>
             <SlavesList
               isMe={slave.id === currentUserInfo.id}
@@ -274,7 +321,7 @@ const User: FC<IProps> = ({
               router={router}
               pageOpened={pageOpened}
               limitShow={true}
-            ></SlavesList>
+            />
           </div>
           <FixedLayout vertical="bottom">
             <Div style={{ paddingBottom: 0 }}>
