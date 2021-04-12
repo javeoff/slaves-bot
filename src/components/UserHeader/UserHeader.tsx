@@ -32,9 +32,11 @@ interface IProps {
   isMe: boolean;
   master: UserInfo;
   onBuySelf: VoidFunction;
+  onSubscribeOnGroup?: VoidFunction;
   router: Router;
   pageOpened: string;
   currentUserId: number;
+  showGroup?: boolean;
 }
 
 export const UserHeader: FC<IProps> = ({
@@ -45,7 +47,9 @@ export const UserHeader: FC<IProps> = ({
   router,
   pageOpened,
   currentUserId,
+  showGroup = false,
   onBuySelf,
+  onSubscribeOnGroup,
 }) => {
   console.log("Updated user header", slave);
   const isMine = slave.master_id == currentUserId;
@@ -54,16 +58,6 @@ export const UserHeader: FC<IProps> = ({
   const masterAvatarStyles = { paddingRight: 0 };
   const freeButtonStyles = { paddingTop: 2 };
   const masterTakenStyles = { fontSize: 14 };
-  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
-
-  useEffect(() => {
-    const loadIsSubscribed = async () => {
-      if (!isSubscribed) {
-        setIsSubscribed((await bridgeClient.isSubscribed()).response);
-      }
-    };
-    void loadIsSubscribed();
-  }, []);
 
   const buySelfCallback = useCallback(() => {
     onBuySelf();
@@ -121,7 +115,7 @@ export const UserHeader: FC<IProps> = ({
           </Div>
         ) : null}
       </div>
-      {!isSubscribed && (
+      {showGroup ? (
         <div style={{ marginTop: 6 }}>
           <SimpleCell
             before={
@@ -133,16 +127,12 @@ export const UserHeader: FC<IProps> = ({
               />
             }
             description="Подписывайтесь и ставьте лайки"
-            onClick={() =>
-              bridgeClient.joinGroup().then(() => {
-                setIsSubscribed(true);
-              })
-            }
+            onClick={() => (onSubscribeOnGroup ? onSubscribeOnGroup() : null)}
           >
             Наша группа ВКонтакте
           </SimpleCell>
         </div>
-      )}
+      ) : null}
 
       {master && master.id ? (
         <Div style={{ userSelect: "none" }}>

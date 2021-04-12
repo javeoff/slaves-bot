@@ -5,10 +5,8 @@ import {
   Avatar,
   Button,
   Div,
-  IconButton,
   PanelHeaderButton,
   PullToRefresh,
-  SimpleCell,
   Snackbar,
 } from "@vkontakte/vkui";
 
@@ -32,8 +30,6 @@ import { openErrorModal } from "../modals/openers";
 import { MODAL_YOUSLAVE_CARD } from "../modals/YouSlave";
 import { DeleteAccountAlert } from "../popouts/deleteAccountAlert";
 
-import { Icon28ChevronRightCircleOutline } from "@vkontakte/icons";
-
 interface IProps extends IWithCurrentUserInfo {
   id?: string;
   onRefresh: AnyFunction;
@@ -48,6 +44,8 @@ const Home: FC<IProps> = ({
   userSlave,
   userSlaves,
   userSlavesInfo,
+  userSubscribedOnGroup,
+  setUserSubscribedOnGroup,
   onRefresh,
   updateSlaves,
   isFetching,
@@ -69,6 +67,16 @@ const Home: FC<IProps> = ({
         );
       }
     }
+  }, []);
+
+  useEffect(() => {
+    const loadIsSubscribed = async () => {
+      if (userSubscribedOnGroup == null) {
+        let subscribed = (await bridgeClient.isSubscribed()).response == true;
+        setUserSubscribedOnGroup(subscribed);
+      }
+    };
+    void loadIsSubscribed();
   }, []);
 
   let generatedSlavesList: ISlaveWithUserInfo[] = [];
@@ -129,6 +137,12 @@ const Home: FC<IProps> = ({
     );
   };
 
+  const subscribeOnGroup = () => {
+    bridgeClient.joinGroup().then(() => {
+      setUserSubscribedOnGroup(true);
+    });
+  };
+
   console.log("Complete render user page", Date.now());
   return (
     <Panel id={id}>
@@ -157,21 +171,9 @@ const Home: FC<IProps> = ({
           pageOpened={PAGE_PROFILE_USER}
           router={router}
           currentUserId={userInfo.id}
+          showGroup={userSubscribedOnGroup === false}
+          onSubscribeOnGroup={() => subscribeOnGroup()}
         ></UserHeader>
-        {userSlave.slaves_count <= 10 && (
-          <Div>
-            <InfoBlock
-              icon={<Icon32LinkCircleOutline fill="#fff" />}
-              title="Первые рабы"
-              subtitle="Поделитесь ссылкой с друзьями, чтобы они стали вашими рабами."
-              action={
-                <Button mode="overlay_secondary" onClick={copyRefLink}>
-                  vk.com/app7809644#r{userInfo.id}
-                </Button>
-              }
-            ></InfoBlock>
-          </Div>
-        )}
         {userSlave.slaves_count <= 10 && (
           <Div>
             <InfoBlock

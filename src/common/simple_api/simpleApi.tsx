@@ -73,6 +73,12 @@ class SimpleApi {
     });
   }
 
+  acceptTerms(): Promise<boolean> {
+    return this.callApi<boolean>("acceptTerms", {
+      params: {},
+    });
+  }
+
   buySlave(slaveId: number): Promise<IUserActionResponseDto> {
     return this.callApi<IUserActionResponseDto>("buySlave", {
       params: {

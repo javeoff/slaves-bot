@@ -38,6 +38,7 @@ const mapStateToCurrentUserProps = (state: IRootState) => {
             state.app.slaves[state.app.currentUserId].master_id
           ]
         : DefaultUserInfo,
+    userSubscribedOnGroup: state.app.userSubscribedOnGroup
   };
 };
 
@@ -98,6 +99,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch(appSlice.actions.setUserLoaded(userId)),
   updateFriendsIds: (userIds: Record<number, number[]>) =>
     dispatch(appSlice.actions.updateFriendsIds(userIds)),
+  setUserSubscribedOnGroup: (subscribed: boolean) =>
+    dispatch(appSlice.actions.setUserSubscribedOnGroup(subscribed)),
 });
 
 export type IWithAppState = ReturnType<typeof mapStateToProps> &

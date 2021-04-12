@@ -4,6 +4,7 @@ import PanelHeader from "@vkontakte/vkui/dist/components/PanelHeader/PanelHeader
 import {
   Avatar,
   Button,
+  Card,
   Div,
   FixedLayout,
   Group,
@@ -145,7 +146,7 @@ const User: FC<IProps> = ({
       .then(async (newFriends) => {
         shuffle(newFriends);
         updateFriendsIds({
-          [userInfo.id]: newFriends.slice(0, 22).map((u) => u.id),
+          [userInfo.id]: newFriends.slice(0, 30).map((u) => u.id),
         });
 
         updateUsersInfo(newFriends);
@@ -308,27 +309,35 @@ const User: FC<IProps> = ({
           />
           {!friendsIds[userInfo.id]?.length || (
             <Group header={<Header mode="primary">Друзья</Header>}>
-              <Div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {friendsIds[userInfo.id].map((friendId) => {
-                  if (!usersInfo[friendId]) return null;
+              <Div>
+                <Card mode="outline">
+                  <Div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "flex-start",
+                      maxHeight: 93,
+                      overflow: " hidden",
+                      paddingLeft: 10,
+                      paddingRight: 10,
+                    }}
+                  >
+                    {friendsIds[userInfo.id].map((friendId) => {
+                      if (!usersInfo[friendId]) return null;
 
-                  return (
-                    <div style={{ padding: 4 }}>
-                      <Avatar
-                        size={46}
-                        onClick={() => openSlave(usersInfo[friendId]?.id)}
-                        src={usersInfo[friendId].photo_100}
-                        style={{ cursor: "pointer" }}
-                      />
-                    </div>
-                  );
-                })}
+                      return (
+                        <div style={{ padding: "5px 10px" }}>
+                          <Avatar
+                            size={40}
+                            onClick={() => openSlave(usersInfo[friendId]?.id)}
+                            src={usersInfo[friendId].photo_100}
+                            style={{ cursor: "pointer" }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </Div>
+                </Card>
               </Div>
             </Group>
           )}

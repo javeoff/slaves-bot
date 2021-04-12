@@ -15,6 +15,7 @@ const initialState: IAppState = {
   ratingTab: "global-rating",
   loadedUsers: [],
   friendsIds: [],
+  userSubscribedOnGroup: null,
 };
 
 export interface IAppState {
@@ -29,6 +30,7 @@ export interface IAppState {
   ratingTab: string;
   loadedUsers: number[];
   friendsIds: Record<number, number[]>;
+  userSubscribedOnGroup: boolean|null;
 }
 
 export const appSlice = createSlice({
@@ -75,6 +77,9 @@ export const appSlice = createSlice({
     },
     setUserLoaded: (draft, action: PayloadAction<number>) => {
       draft.loadedUsers.push(action.payload);
+    },
+    setUserSubscribedOnGroup: (draft, action: PayloadAction<boolean>) => {
+      draft.userSubscribedOnGroup = action.payload;
     },
     updateFriendsIds: (
       draft,
