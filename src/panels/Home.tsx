@@ -150,7 +150,7 @@ const Home: FC<IProps> = ({
         left={
           <PanelHeaderButton
             onClick={() => {
-              router.pushPopout(<DeleteAccountAlert />, {});
+              router.pushPopout(DeleteAccountAlert, {});
             }}
             primary={false}
           >

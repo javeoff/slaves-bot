@@ -16,6 +16,7 @@ import {
   withCurrentUserInfo,
 } from "../features/App/hocs/withAppState";
 import { MODAL_ERROR_CARD } from "./Error";
+import { ErrorAlert } from "../popouts/errorAlert";
 
 interface IProps extends IWithCurrentUserInfo {
   onClose: VoidFunction;
@@ -36,7 +37,7 @@ export const ModalGiveJobPage: FC<IProps> = ({ id, onClose, updateSlaves }) => {
         updateSlaves([res.user, res.slave]);
       })
       .catch((e) => {
-        getActiveRouter().pushModal(MODAL_ERROR_CARD, {
+        getActiveRouter().pushPopout(ErrorAlert, {
           message: e.message,
         });
       });

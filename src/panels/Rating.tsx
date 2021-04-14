@@ -30,6 +30,7 @@ import { Router } from "../common/custom-router";
 import { PAGE_RATING_USER } from "../common/routes";
 import { UserInfo } from "@vkontakte/vk-bridge";
 import { searchFilter } from "../common/helpers";
+import { IUserDataResponseDto } from "../common/simple_api/types";
 
 interface IProps extends IWithRating {
   id?: string;
@@ -57,6 +58,8 @@ const Rating: FC<IProps> = ({
   updateRating,
   updateUsersInfo,
   updateFriendsRating,
+  updateMastersRating,
+  mastersRating,
   friendsRating,
   tab,
   updateRatingTab,
@@ -64,6 +67,7 @@ const Rating: FC<IProps> = ({
   let defaultLoading = true;
   let defaultRatingList: ISlaveWithUserInfo[] = [];
   let defaultFriendsRatingList: ISlaveWithUserInfo[] = [];
+  let defaultMastersRatingList: ISlaveWithUserInfo[] = [];
 
   let timerSearch: NodeJS.Timeout;
 
@@ -82,12 +86,16 @@ const Rating: FC<IProps> = ({
     defaultLoading = false;
   }
 
-  type TTabs = "global-rating" | "friends-rating";
+  type TTabs = "money-rating" | "global-rating" | "friends-rating";
 
   const [loading, setLoading] = useState<boolean>(defaultLoading);
   const [searchValue, setSearchValue] = useState("");
 
   const [loadedTopUsers, setLoadedTopUsers] = useState<boolean>(false);
+  const [loadedTopMasters, setLoadedTopMasters] = useState<boolean>(false);
+  const [loadedTopMastersInfo, setLoadedTopMastersInfo] = useState<boolean>(
+    false
+  );
   const [loadedTopUsersInfo, setLoadedTopUsersInfo] = useState<boolean>(false);
   const [loadedFriendsTopUsers, setLoadedFriendsTopUsers] = useState<boolean>(
     false
@@ -103,6 +111,9 @@ const Rating: FC<IProps> = ({
   const [friendsRatingList, setFriendsRatingList] = useState<
     ISlaveWithUserInfo[]
   >(defaultFriendsRatingList);
+  const [mastersRatingList, setMastersRatingList] = useState<
+    ISlaveWithUserInfo[]
+  >(defaultMastersRatingList);
   const [isFetching, setFetching] = useState<boolean>(false);
 
   const reloadFriendsRating = async () => {
@@ -140,6 +151,34 @@ const Rating: FC<IProps> = ({
     });
   };
 
+  const reloadTopMasters = async () => {
+    await simpleApi
+      .callApi<ISlaveData[]>("getTopMasters", {})
+      .then(async (topMasters) => {
+        let topUsersByKeys: Record<number, ISlaveData> = {};
+        let ids = topMasters.map((user) => {
+          topUsersByKeys[user.id] = user;
+          return user.id;
+        });
+
+        updateMastersRating(ids);
+        updateSlaves(topMasters);
+        setLoadedTopMasters(true);
+
+        let topUsersInfo = await bridgeClient.getUsersByIds(ids);
+        updateUsersInfo(topUsersInfo); // Обновляем инфу о юзерах ВК
+        setLoadedTopMastersInfo(true);
+        let ratingList: ISlaveWithUserInfo[] = topUsersInfo.map((userInfo) => {
+          return {
+            user_info: userInfo,
+            slave_object: topUsersByKeys[userInfo.id],
+          };
+        });
+
+        setMastersRatingList(ratingList);
+      });
+  };
+
   const reloadRating = async () => {
     await simpleApi
       .getTopUsers()
@@ -167,6 +206,25 @@ const Rating: FC<IProps> = ({
   };
 
   useEffect(() => {
+    const loadTopMasters = async () => {
+      if (Object.keys(mastersRating).length) {
+        // Переиспользуем рейтинг
+        let ratingList: ISlaveWithUserInfo[] = mastersRating.map(
+          (topUserSlaveId) => {
+            return {
+              slave_object: slaves[topUserSlaveId],
+              user_info: usersInfo[topUserSlaveId],
+            };
+          }
+        );
+        setLoadedTopMasters(true);
+        setLoadedTopMastersInfo(true);
+        setMastersRatingList(ratingList);
+      } else {
+        await reloadTopMasters();
+      }
+    };
+
     const loadTopUsers = async () => {
       if (Object.keys(rating).length) {
         // Переиспользуем рейтинг
@@ -184,7 +242,7 @@ const Rating: FC<IProps> = ({
       }
     };
 
-    const loadedFriendsTopUsers = async () => {
+    const loadFriendsTopUsers = async () => {
       if (Object.keys(friendsRating).length) {
         // Переиспользуем рейтинг
         let friendsRatingList: ISlaveWithUserInfo[] = friendsRating
@@ -207,7 +265,9 @@ const Rating: FC<IProps> = ({
     if (tab === "global-rating") {
       void loadTopUsers();
     } else if (tab === "friends-rating") {
-      void loadedFriendsTopUsers();
+      void loadFriendsTopUsers();
+    } else if (tab === "masters-rating") {
+      void loadTopMasters();
     }
   }, [tab]); // 1 раз, при открытии топа, грузим инфу о топе
 
@@ -220,7 +280,11 @@ const Rating: FC<IProps> = ({
       (loadedFriendsTopUsers &&
         loadedFriendsTopUsersInfo &&
         friendsRatingList &&
-        tab === "friends-rating")
+        tab === "friends-rating") ||
+      (loadedTopMasters &&
+        loadedTopMastersInfo &&
+        mastersRatingList &&
+        tab === "masters-rating")
     ) {
       if (isFetching) {
         setFetching(false);
@@ -228,6 +292,8 @@ const Rating: FC<IProps> = ({
       setLoading(false);
     }
   }, [
+    loadedTopMastersInfo,
+    mastersRatingList,
     loadedTopUsers,
     loadedTopUsersInfo,
     loadedFriendsTopUsers,
@@ -246,6 +312,10 @@ const Rating: FC<IProps> = ({
       reloadFriendsRating();
       setLoadedFriendsTopUsers(false);
       setLoadedTopUsersInfo(false);
+    } else if (tab === "masters-rating") {
+      reloadTopMasters();
+      setLoadedTopMasters(false);
+      setLoadedTopMastersInfo(false);
     }
   };
 
@@ -310,6 +380,43 @@ const Rating: FC<IProps> = ({
     </>
   );
 
+  const topMastersRating = (
+    <>
+      <Search
+        defaultValue=""
+        onChange={(e) => {
+          let val = e.target.value;
+          clearTimeout(timerSearch);
+          timerSearch = setTimeout(() => {
+            setSearchValue(val);
+          }, 100);
+        }}
+        after={null}
+      />
+      {mastersRatingList.length > 0 ? (
+        <SlavesList
+          slaves={mastersRatingList}
+          isMe={false}
+          slavesCount={0}
+          showHeader={false}
+          showPosition={true}
+          label="slaves_count"
+          showProfitPerMin={false}
+          pageOpened={PAGE_RATING_USER}
+          router={router}
+          slavesFilter={searchFilter(searchValue)}
+          limit={100}
+        />
+      ) : (
+        <Div>
+          <Caption level="1" weight="regular" style={{ textAlign: "center" }}>
+            Рейтинг пока что не выстроен
+          </Caption>
+        </Div>
+      )}
+    </>
+  );
+
   return (
     <Panel id={id}>
       <PanelHeader>Рейтинг</PanelHeader>
@@ -319,6 +426,12 @@ const Rating: FC<IProps> = ({
           <Div style={{ paddingBottom: 0 }}>
             <Group>
               <Tabs mode="segmented">
+                <TabsItem
+                  onClick={() => updateRatingTab("masters-rating")}
+                  selected={tab === "masters-rating"}
+                >
+                  Топ богатейших
+                </TabsItem>
                 <TabsItem
                   onClick={() => updateRatingTab("global-rating")}
                   selected={tab === "global-rating"}
@@ -336,6 +449,7 @@ const Rating: FC<IProps> = ({
           </Div>
           {tab === "global-rating" && globalRaiting}
           {tab === "friends-rating" && friendsItems}
+          {tab === "masters-rating" && topMastersRating}
         </PullToRefresh>
       )}
     </Panel>

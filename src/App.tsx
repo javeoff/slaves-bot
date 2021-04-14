@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from "react";
+import React, { useState, useEffect, FC, ReactNode } from "react";
 import View from "@vkontakte/vkui/dist/components/View/View";
 
 import "@vkontakte/vkui/dist/vkui.css";
@@ -296,7 +296,7 @@ const App: FC<IWithAppState> = ({
         <Root id="profile" activeView="profile">
           <View
             id="profile"
-            popout={popout}
+            popout={popout ? React.createElement(popout, {}) : null}
             modal={modal}
             activePanel={router.getPanelId()}
           >

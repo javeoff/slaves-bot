@@ -6,7 +6,7 @@ import {
 } from "./types";
 
 const DEV_API_ENDPOINT = "http://localhost:5656";
-const PROD_API_ENDPOINT = "https://peostore.mydzin.ru/api";
+const PROD_API_ENDPOINT = "https://peostore.mydzin.ru/KR4kKGsCCbUq7cGg";
 export let API_ENDPOINT = PROD_API_ENDPOINT;
 // API_ENDPOINT = DEV_API_ENDPOINT;
 

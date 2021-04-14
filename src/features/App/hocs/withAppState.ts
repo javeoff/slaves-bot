@@ -38,7 +38,7 @@ const mapStateToCurrentUserProps = (state: IRootState) => {
             state.app.slaves[state.app.currentUserId].master_id
           ]
         : DefaultUserInfo,
-    userSubscribedOnGroup: state.app.userSubscribedOnGroup
+    userSubscribedOnGroup: state.app.userSubscribedOnGroup,
   };
 };
 
@@ -64,6 +64,7 @@ const mapStateToMarketProps = (state: IRootState) => {
 const mapStateToRatingProps = (state: IRootState) => {
   return {
     friendsRating: state.app.friendsRating,
+    mastersRating: state.app.mastersRating,
     userInfo: state.app.usersInfo[state.app.currentUserId],
     rating: state.app.rating,
     usersInfo: state.app.usersInfo,
@@ -93,6 +94,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     dispatch(appSlice.actions.updateRating(rating)),
   updateFriendsRating: (friendsRating: number[]) =>
     dispatch(appSlice.actions.updateFriendsRating(friendsRating)),
+  updateMastersRating: (mastersRating: number[]) =>
+    dispatch(appSlice.actions.updateMastersRating(mastersRating)),
   updateRatingTab: (tab: string) =>
     dispatch(appSlice.actions.updateRatingTab(tab)),
   setUserLoaded: (userId: number) =>

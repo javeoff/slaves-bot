@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { FC } from "react";
 import { bridgeClient } from "../bridge/bridge";
 import { sleep } from "../helpers";
 
@@ -18,7 +18,7 @@ interface Page {
 
 interface Popout {
   params: Record<string, string>;
-  element: ReactElement;
+  element: FC;
 }
 
 interface History {
@@ -152,17 +152,19 @@ export class Router {
   init() {
     let foundLocation = false;
     for (let routePath in this.routes) {
-      let route = this.routes[routePath];
-      if (this.defaultPath.match(pathToRegexp(routePath))) {
-        let matched = match(routePath)(this.defaultPath);
-        foundLocation = true;
-        this.pushPage(
-          route.activeView,
-          route.activePanel,
-          matched.params,
-          route.isInfinity
-        );
-        break;
+      if (this.routes.hasOwnProperty(routePath)) {
+        let route = this.routes[routePath];
+        if (this.defaultPath.match(pathToRegexp(routePath))) {
+          let matched = match(routePath)(this.defaultPath);
+          foundLocation = true;
+          this.pushPage(
+            route.activeView,
+            route.activePanel,
+            matched.params,
+            route.isInfinity
+          );
+          break;
+        }
       }
     }
     if (!foundLocation && this.routes["/"]) {
@@ -192,10 +194,16 @@ export class Router {
   getParams(): Record<string, string> {
     let panels = this.history.panelsHistory[this.getViewId()];
     let modals = this.history.modalsHistory[this.getViewId()];
-    if (modals && modals.length) {
+    let popouts = this.history.popoutsHistory[this.getViewId()];
+
+    if (popouts?.length && popouts[popouts.length - 1].params) {
+      return popouts[popouts.length - 1].params;
+    }
+
+    if (modals?.length && modals.length) {
       return modals[modals.length - 1].params;
     }
-    if (panels && panels[panels.length - 1].params) {
+    if (panels?.length && panels[panels.length - 1].params) {
       return panels[panels.length - 1].params;
     } else {
       return {};
@@ -311,7 +319,7 @@ export class Router {
     return modals ? modals[modals.length - 1]?.id || null : null;
   }
 
-  getPopout(): ReactElement | null {
+  getPopout(): FC | null {
     let popouts = this.history.popoutsHistory[this.getViewId()];
     return popouts ? popouts[popouts.length - 1]?.element || null : null;
   }
@@ -337,7 +345,7 @@ export class Router {
     }
   }
 
-  async pushPopout(popout: ReactElement, params: Record<string, string>) {
+  async pushPopout(popout: FC, params: Record<string, string>) {
     window.history.pushState("", "", null);
     this.openedModal = true;
     if (this.getViewId()) {
