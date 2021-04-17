@@ -36,6 +36,7 @@ interface IProps {
   slavesFilter?: (slave: ISlaveWithUserInfo) => boolean;
   limit?: number;
   limitShow?: boolean;
+  noTopPadding?: boolean;
 }
 
 export const SlavesList: FC<IProps> = ({
@@ -52,6 +53,7 @@ export const SlavesList: FC<IProps> = ({
   pageOpened,
   router,
   limitShow = false,
+  noTopPadding = false,
 }) => {
   const showOnlyDefault = !limitShow ? 10000 : 100;
   console.log(showOnlyDefault);
@@ -123,6 +125,8 @@ export const SlavesList: FC<IProps> = ({
       )}
       <div style={listStyles} id="slaves-list">
         {slaves.map((slave, i) => {
+          if (!slave.user_info) return null;
+          if (!slave.slave_object) return null;
           if (
             (slavesFilter && !slavesFilter(slave)) ||
             slave.slave_object.deleted
@@ -134,6 +138,7 @@ export const SlavesList: FC<IProps> = ({
             <Div
               key={"slave_" + slave.user_info.id + "_" + i}
               className="slaves-list--item"
+              style={i == 0 && noTopPadding ? { paddingTop: 4 } : {}}
             >
               <Card mode="shadow">
                 <Div

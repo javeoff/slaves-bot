@@ -332,6 +332,7 @@ const Rating: FC<IProps> = ({
           showProfitPerMin={false}
           pageOpened={PAGE_RATING_USER}
           router={router}
+          noTopPadding
         />
       ) : (
         <Div>
@@ -369,6 +370,7 @@ const Rating: FC<IProps> = ({
           router={router}
           slavesFilter={searchFilter(searchValue)}
           limit={100}
+          noTopPadding
         />
       ) : (
         <Div>
@@ -382,17 +384,6 @@ const Rating: FC<IProps> = ({
 
   const topMastersRating = (
     <>
-      <Search
-        defaultValue=""
-        onChange={(e) => {
-          let val = e.target.value;
-          clearTimeout(timerSearch);
-          timerSearch = setTimeout(() => {
-            setSearchValue(val);
-          }, 100);
-        }}
-        after={null}
-      />
       {mastersRatingList.length > 0 ? (
         <SlavesList
           slaves={mastersRatingList}
@@ -404,8 +395,8 @@ const Rating: FC<IProps> = ({
           showProfitPerMin={false}
           pageOpened={PAGE_RATING_USER}
           router={router}
-          slavesFilter={searchFilter(searchValue)}
           limit={100}
+          noTopPadding
         />
       ) : (
         <Div>
@@ -427,22 +418,22 @@ const Rating: FC<IProps> = ({
             <Group>
               <Tabs mode="segmented">
                 <TabsItem
-                  onClick={() => updateRatingTab("masters-rating")}
-                  selected={tab === "masters-rating"}
-                >
-                  Топ богатейших
-                </TabsItem>
-                <TabsItem
                   onClick={() => updateRatingTab("global-rating")}
                   selected={tab === "global-rating"}
                 >
-                  Глобальный топ
+                  По рабам
+                </TabsItem>
+                <TabsItem
+                  onClick={() => updateRatingTab("masters-rating")}
+                  selected={tab === "masters-rating"}
+                >
+                  По цене рабов
                 </TabsItem>
                 <TabsItem
                   onClick={() => updateRatingTab("friends-rating")}
                   selected={tab === "friends-rating"}
                 >
-                  Топ Друзей
+                  Друзья
                 </TabsItem>
               </Tabs>
             </Group>

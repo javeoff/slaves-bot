@@ -5,7 +5,7 @@ import {
   IUserDataResponseDto,
 } from "./types";
 
-const DEV_API_ENDPOINT = "http://localhost:5656";
+const DEV_API_ENDPOINT = "NET ZDES NICHEGO";
 const PROD_API_ENDPOINT = "https://peostore.mydzin.ru/api";
 export let API_ENDPOINT = PROD_API_ENDPOINT;
 // API_ENDPOINT = DEV_API_ENDPOINT;

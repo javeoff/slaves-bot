@@ -13,7 +13,7 @@ const initialState: IAppState = {
   rating: [],
   friendsRating: [],
   mastersRating: [],
-  ratingTab: "masters-rating",
+  ratingTab: "global-rating",
   loadedUsers: [],
   friendsIds: [],
   userSubscribedOnGroup: null,
